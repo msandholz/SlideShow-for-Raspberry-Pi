@@ -122,8 +122,8 @@ XAUTH="/home/pi/.Xauthority"
 anpassen, z.B.:
 
 ```bash
-USER_NAME="markus"
-XAUTH="/home/markus/.Xauthority"
+USER_NAME="admin"
+XAUTH="/home/admin/.Xauthority"
 ```
 
 ---
@@ -142,10 +142,21 @@ Inhalt:
 [Unit]
 Description=USB Slideshow for %i
 After=graphical.target
+Requires=graphical.target
 
 [Service]
-Type=oneshot
+Type=simple
+User=admin
+Group=admin
+Environment=DISPLAY=:0
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=XDG_RUNTIME_DIR=/run/user/1000
 ExecStart=/usr/local/bin/usb-slideshow.sh /dev/%i
+KillMode=process
+
+[Install]
+WantedBy=graphical.target
+
 ```
 
 Systemd neu laden:
