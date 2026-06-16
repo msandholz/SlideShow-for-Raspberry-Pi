@@ -1,4 +1,3 @@
-````markdown
 # Raspberry Pi USB-Bilderrahmen mit automatischer Diashow
 
 ## Ziel
@@ -352,4 +351,3 @@ find /media/slideshow -type f
 # Lizenz
 
 Diese Anleitung darf frei verwendet, angepasst und erweitert werden.
-````
