@@ -61,18 +61,18 @@ Inhalt:
 
 DEVICE="$1"
 MOUNTPOINT="/media/slideshow"
-USER_NAME="pi"
+USER_NAME="admin"
 DISPLAY_ID=":0"
-XAUTH="/home/pi/.Xauthority"
+XAUTH="/home/admin/.Xauthority"
 
 # laufende Diashow beenden
 pkill -u "$USER_NAME" feh 2>/dev/null
 
 # vorheriges Medium aushängen
-umount "$MOUNTPOINT" 2>/dev/null
+sudo umount "$MOUNTPOINT" 2>/dev/null
 
 # USB-Stick mounten
-mount "$DEVICE" "$MOUNTPOINT" || exit 1
+sudo mount "$DEVICE" "$MOUNTPOINT" || exit 1
 
 sleep 1
 
