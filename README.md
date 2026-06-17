@@ -317,7 +317,7 @@ chmod +x /opt/slideshow/kiosk.sh
 Datei anlegen:
 
 ```bash
-sudo nano /etc/systemd/system/slideshow-kiosk.service
+sudo nano /etc/systemd/system/slideshow.service
 ```
 
 Inhalt:
@@ -348,7 +348,7 @@ Aktivieren:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable slideshow-kiosk.service
+sudo systemctl enable slideshow.service
 ```
 
 ---
@@ -388,13 +388,13 @@ tail -f /var/log/slideshow/slideshow.log
 Service-Log:
 
 ```bash
-journalctl -u slideshow-kiosk.service -f
+journalctl -u slideshow.service -f
 ```
 
 Status:
 
 ```bash
-systemctl status slideshow-kiosk.service
+systemctl status slideshow.service
 ```
 
 ---
