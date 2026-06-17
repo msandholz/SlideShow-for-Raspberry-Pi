@@ -1,3 +1,553 @@
+
+# Raspberry Pi Slideshow Viewer
+
+## Ziel
+
+Raspberry Pi 3B mit Raspberry Pi OS als automatischer Slideshow-Viewer:
+
+* WLAN-SSID: `WLAN`
+* Hostname/mDNS: `SlideShow.local`
+* Benutzer: `admin`
+* Bilder vom USB-Stick anzeigen
+* Ohne USB-Stick oder ohne Bilder: Standardbild anzeigen
+* USB-Stick kann im laufenden Betrieb gesteckt/gezogen werden
+* Vollautomatischer Betrieb nach dem Einschalten
+
+---
+
+# 1. System aktualisieren
+
+```bash
+sudo apt update
+sudo apt full-upgrade -y
+sudo reboot
+```
+
+---
+
+# 2. Hostname konfigurieren
+
+Hostname setzen:
+
+```bash
+sudo hostnamectl set-hostname SlideShow
+```
+
+Datei prüfen:
+
+```bash
+cat /etc/hostname
+```
+
+Ausgabe:
+
+```text
+SlideShow
+```
+
+Neustart:
+
+```bash
+sudo reboot
+```
+
+Test von einem anderen Rechner:
+
+```bash
+ping SlideShow.local
+```
+
+---
+
+# 3. WLAN konfigurieren
+
+```bash
+sudo raspi-config
+```
+
+Menü:
+
+```text
+System Options
+ └── Wireless LAN
+```
+
+Eintragen:
+
+```text
+SSID: WLAN
+Passphrase: <WLAN-PASSWORT>
+```
+
+Verbindung prüfen:
+
+```bash
+iwgetid
+hostname -I
+```
+
+---
+
+# 4. Benötigte Software installieren
+
+```bash
+sudo apt update
+sudo apt install -y \
+    feh \
+    imagemagick \
+    udisks2 \
+    x11-xserver-utils
+```
+
+Verwendete Komponenten:
+
+| Paket             | Zweck                  |
+| ----------------- | ---------------------- |
+| feh               | Bildanzeige            |
+| imagemagick       | Erzeugung Standardbild |
+| udisks2           | USB-Mounting           |
+| x11-xserver-utils | Bildschirmsteuerung    |
+
+---
+
+# 5. Automatischen Login aktivieren
+
+```bash
+sudo raspi-config
+```
+
+Menü:
+
+```text
+System Options
+ └── Boot / Auto Login
+      └── Desktop Autologin
+```
+
+Danach:
+
+```bash
+sudo reboot
+```
+
+---
+
+# 6. Projektverzeichnis anlegen
+
+```bash
+mkdir -p /home/admin/slideshow
+mkdir -p /home/admin/slideshow/default
+mkdir -p /home/admin/slideshow/runtime
+```
+
+Besitzrechte setzen:
+
+```bash
+sudo chown -R admin:admin /home/admin/slideshow
+```
+
+---
+
+# 7. Standardbild erstellen
+
+```bash
+convert \
+  -size 1920x1080 \
+  xc:black \
+  -fill white \
+  -gravity center \
+  -pointsize 60 \
+  -annotate 0 "Keine Bilder gefunden" \
+  /home/admin/slideshow/default/default.png
+```
+
+Alternativ kann ein eigenes Bild verwendet werden:
+
+```bash
+cp mein_bild.png /home/admin/slideshow/default/default.png
+```
+
+---
+
+# 8. Slideshow-Skript erstellen
+
+Datei anlegen:
+
+```bash
+nano /home/admin/slideshow/slideshow.sh
+```
+
+Inhalt:
+
+```bash
+#!/bin/bash
+
+DEFAULT_IMAGE="/home/admin/slideshow/default/default.png"
+
+RUNTIME_DIR="/home/admin/slideshow/runtime"
+
+PLAYLIST="$RUNTIME_DIR/playlist.txt"
+CURRENT_PLAYLIST="$RUNTIME_DIR/current_playlist.txt"
+
+IMAGE_EXTENSIONS="jpg jpeg png gif bmp webp tif tiff"
+
+export DISPLAY=:0
+
+mkdir -p "$RUNTIME_DIR"
+
+xset s off
+xset -dpms
+xset s noblank
+
+mount_usb_devices() {
+
+    lsblk -rpo NAME,TRAN,TYPE,MOUNTPOINT |
+
+    awk '$2=="usb" && $3=="part" {print $1}' |
+
+    while read DEV
+    do
+        if ! lsblk -rpo NAME,MOUNTPOINT | grep -q "^$DEV .*"
+        then
+            udisksctl mount -b "$DEV" >/dev/null 2>&1
+        fi
+    done
+}
+
+create_playlist() {
+
+    > "$PLAYLIST"
+
+    for BASE in \
+        /media/admin \
+        /run/media/admin \
+        /mnt
+    do
+
+        [ -d "$BASE" ] || continue
+
+        for EXT in $IMAGE_EXTENSIONS
+        do
+            find "$BASE" \
+                -type f \
+                -iname "*.$EXT" \
+                2>/dev/null \
+                >> "$PLAYLIST"
+        done
+
+    done
+
+    sort -u "$PLAYLIST" -o "$PLAYLIST"
+
+    if [ ! -s "$PLAYLIST" ]
+    then
+        echo "$DEFAULT_IMAGE" > "$PLAYLIST"
+    fi
+}
+
+start_viewer() {
+
+    pkill -x feh 2>/dev/null
+
+    feh \
+        --fullscreen \
+        --auto-zoom \
+        --hide-pointer \
+        --slideshow-delay 8 \
+        --reload 5 \
+        --filelist "$CURRENT_PLAYLIST" &
+}
+
+echo "$DEFAULT_IMAGE" > "$CURRENT_PLAYLIST"
+
+start_viewer
+
+while true
+do
+
+    mount_usb_devices
+
+    create_playlist
+
+    if ! cmp -s "$PLAYLIST" "$CURRENT_PLAYLIST"
+    then
+        cp "$PLAYLIST" "$CURRENT_PLAYLIST"
+        start_viewer
+    fi
+
+    sleep 5
+
+done
+```
+
+Datei speichern.
+
+Ausführbar machen:
+
+```bash
+chmod +x /home/admin/slideshow/slideshow.sh
+```
+
+---
+
+# 9. LXDE Autostart konfigurieren
+
+Ordner erstellen:
+
+```bash
+mkdir -p /home/admin/.config/lxsession/LXDE-pi
+```
+
+Datei anlegen:
+
+```bash
+nano /home/admin/.config/lxsession/LXDE-pi/autostart
+```
+
+Inhalt:
+
+```text
+@xset s off
+@xset -dpms
+@xset s noblank
+@/home/admin/slideshow/slideshow.sh
+```
+
+---
+
+# 10. Testen
+
+Skript manuell starten:
+
+```bash
+/home/admin/slideshow/slideshow.sh
+```
+
+---
+
+# 11. Neustart
+
+```bash
+sudo reboot
+```
+
+---
+
+# Verhalten
+
+## Fall 1
+
+USB-Stick mit Bildern vorhanden:
+
+```text
+Boot
+ ↓
+USB erkannt
+ ↓
+Bilder gefunden
+ ↓
+Slideshow startet
+```
+
+---
+
+## Fall 2
+
+USB-Stick vorhanden aber keine Bilder:
+
+```text
+Boot
+ ↓
+USB erkannt
+ ↓
+Keine Bilder
+ ↓
+Standardbild anzeigen
+```
+
+---
+
+## Fall 3
+
+Kein USB-Stick vorhanden:
+
+```text
+Boot
+ ↓
+Kein USB-Stick
+ ↓
+Standardbild anzeigen
+```
+
+---
+
+## Fall 4
+
+USB-Stick wird gezogen:
+
+```text
+USB entfernt
+ ↓
+Playlist leer
+ ↓
+Standardbild anzeigen
+```
+
+---
+
+## Fall 5
+
+USB-Stick wird gesteckt:
+
+```text
+USB eingesteckt
+ ↓
+Automatische Erkennung
+ ↓
+Bildsuche
+ ↓
+Slideshow startet
+```
+
+---
+
+# Unterstützte Bildformate
+
+```text
+jpg
+jpeg
+png
+gif
+bmp
+webp
+tif
+tiff
+```
+
+---
+
+# Slideshow-Geschwindigkeit ändern
+
+Im Skript:
+
+```bash
+--slideshow-delay 8
+```
+
+Beispiel:
+
+```bash
+--slideshow-delay 15
+```
+
+= 15 Sekunden pro Bild
+
+---
+
+# Fehleranalyse
+
+## WLAN prüfen
+
+```bash
+iwgetid
+ip addr
+```
+
+---
+
+## Hostname prüfen
+
+```bash
+hostname
+```
+
+Ausgabe:
+
+```text
+SlideShow
+```
+
+---
+
+## mDNS prüfen
+
+Von einem anderen Rechner:
+
+```bash
+ping SlideShow.local
+```
+
+---
+
+## USB-Stick prüfen
+
+```bash
+lsblk
+```
+
+---
+
+## Laufende Anzeige prüfen
+
+```bash
+pgrep feh
+```
+
+---
+
+## Slideshow stoppen
+
+```bash
+pkill feh
+```
+
+---
+
+# Ergebnis
+
+Nach dem Einschalten arbeitet der Raspberry Pi vollständig autonom:
+
+* verbindet sich mit WLAN `WLAN`
+* ist unter `SlideShow.local` erreichbar
+* zeigt Bilder von USB-Sticks automatisch an
+* zeigt bei fehlenden Bildern ein Standardbild
+* reagiert automatisch auf Einstecken und Entfernen von USB-Sticks
+* benötigt keine Tastatur oder Maus im Betrieb
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+================
+
+
+
 # Raspberry Pi USB-Bilderrahmen mit automatischer Diashow
 
 ## Ziel
