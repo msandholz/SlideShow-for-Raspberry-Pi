@@ -1,21 +1,21 @@
-# Raspberry Pi 3B USB Slideshow Viewer
+# Raspberry Pi 3B Slideshow-Kiosk mit USB-Stick
 
 ## Ziel
 
-Ein Raspberry Pi 3B mit Raspberry Pi OS Bookworm soll automatisch Bilder von einem USB-Stick als Slideshow anzeigen.
+Ein Raspberry Pi 3B mit Raspberry Pi OS Bookworm soll als robuster Slideshow-Viewer betrieben werden.
 
 ### Anforderungen
 
-* WLAN-Verbindung zur SSID `WLAN`
-* Hostname `SlideShow`
-* Erreichbarkeit per mDNS unter `SlideShow.local`
-* Automatische Bildanzeige von USB-Sticks
-* Unterstützung der gängigsten Bildformate
-* Anzeige eines Standardbildes wenn:
+* Automatische WLAN-Verbindung zur SSID `WLAN`
+* mDNS-Auflösung über `SlideShow.local`
+* Automatische Anzeige von Bildern eines USB-Sticks
+* Anzeige eines Standardbildes, wenn:
 
   * kein USB-Stick vorhanden ist
-  * keine Bilder auf dem USB-Stick gefunden werden
+  * keine Bilder auf dem USB-Stick vorhanden sind
 * Automatische Reaktion auf Einstecken und Entfernen von USB-Sticks
+* Kiosk-Modus ohne Desktop-Bedienung
+* Logging zur Fehleranalyse
 
 ---
 
@@ -23,7 +23,7 @@ Ein Raspberry Pi 3B mit Raspberry Pi OS Bookworm soll automatisch Bilder von ein
 
 ```bash
 sudo apt update
-sudo apt full-upgrade -y
+sudo apt -y full-upgrade
 sudo reboot
 ```
 
@@ -31,7 +31,7 @@ sudo reboot
 
 # 2. WLAN konfigurieren
 
-Verbindung mit der SSID `WLAN` herstellen:
+SSID: `WLAN`
 
 ```bash
 sudo nmcli dev wifi connect "WLAN" password "DEIN_PASSWORT"
@@ -41,12 +41,12 @@ Verbindung prüfen:
 
 ```bash
 nmcli connection show
-ip addr show wlan0
+ip a
 ```
 
 ---
 
-# 3. Hostname konfigurieren
+# 3. Hostname und mDNS konfigurieren
 
 Hostname setzen:
 
@@ -54,32 +54,17 @@ Hostname setzen:
 sudo hostnamectl set-hostname SlideShow
 ```
 
-Neustart durchführen:
+Avahi installieren:
 
 ```bash
-sudo reboot
-```
-
----
-
-# 4. mDNS (Avahi) installieren
-
-Installation:
-
-```bash
-sudo apt install -y avahi-daemon avahi-utils
-```
-
-Dienst aktivieren:
-
-```bash
+sudo apt install -y avahi-daemon
 sudo systemctl enable --now avahi-daemon
 ```
 
-Status prüfen:
+Neustart:
 
 ```bash
-systemctl status avahi-daemon
+sudo reboot
 ```
 
 Danach sollte der Raspberry Pi erreichbar sein über:
@@ -88,28 +73,287 @@ Danach sollte der Raspberry Pi erreichbar sein über:
 SlideShow.local
 ```
 
-Test:
-
-```bash
-ping SlideShow.local
-```
-
 ---
 
-# 5. Benötigte Pakete installieren
+# 4. Benötigte Software installieren
 
 ```bash
 sudo apt install -y \
     feh \
-    udisks2 \
+    xorg \
+    xinit \
+    openbox \
+    unclutter \
     imagemagick \
-    rsync \
-    x11-xserver-utils
+    python3 \
+    python3-pip \
+    udisks2 \
+    exfatprogs
 ```
 
 ---
 
-# 6. Automatischen Desktop-Login aktivieren
+# 5. Verzeichnisstruktur anlegen
+
+```bash
+sudo mkdir -p /opt/slideshow
+sudo mkdir -p /var/log/slideshow
+
+sudo chown -R admin:admin /opt/slideshow
+sudo chown -R admin:admin /var/log/slideshow
+```
+
+---
+
+# 6. Standardbild erzeugen
+
+```bash
+convert \
+  -size 1920x1080 \
+  xc:black \
+  -gravity center \
+  -fill white \
+  -pointsize 60 \
+  -annotate 0 "Bitte USB-Stick einstecken" \
+  /opt/slideshow/default.jpg
+```
+
+---
+
+# 7. Slideshow-Anwendung erstellen
+
+Datei anlegen:
+
+```bash
+sudo nano /opt/slideshow/slideshow.py
+```
+
+Inhalt:
+
+```python
+#!/usr/bin/env python3
+
+import os
+import time
+import hashlib
+import logging
+import subprocess
+from pathlib import Path
+
+IMAGE_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".webp",
+    ".tif",
+    ".tiff"
+}
+
+MEDIA_ROOTS = [
+    Path("/media/admin"),
+    Path("/media"),
+    Path("/mnt")
+]
+
+DEFAULT_IMAGE = Path("/opt/slideshow/default.jpg")
+FILELIST = Path("/tmp/slideshow_images.txt")
+
+LOGFILE = "/var/log/slideshow/slideshow.log"
+
+SLIDE_DELAY = 10
+
+logging.basicConfig(
+    filename=LOGFILE,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+
+def find_images():
+    images = []
+
+    for root in MEDIA_ROOTS:
+        if not root.exists():
+            continue
+
+        for path in root.rglob("*"):
+            try:
+                if path.is_file():
+                    if path.suffix.lower() in IMAGE_EXTENSIONS:
+                        images.append(path)
+            except Exception:
+                pass
+
+    if not images:
+        return [DEFAULT_IMAGE]
+
+    return sorted(images)
+
+
+def image_signature(images):
+    data = ""
+
+    for img in images:
+        try:
+            stat = img.stat()
+            data += f"{img}{stat.st_mtime}{stat.st_size}"
+        except Exception:
+            pass
+
+    return hashlib.sha256(data.encode()).hexdigest()
+
+
+def write_filelist(images):
+    with open(FILELIST, "w") as f:
+        for image in images:
+            f.write(str(image) + "\n")
+
+
+def start_feh():
+    env = os.environ.copy()
+    env["DISPLAY"] = ":0"
+
+    return subprocess.Popen(
+        [
+            "feh",
+            "--fullscreen",
+            "--auto-zoom",
+            "--borderless",
+            "--hide-pointer",
+            "--slideshow-delay",
+            str(SLIDE_DELAY),
+            "--reload",
+            "5",
+            "--randomize",
+            "--filelist",
+            str(FILELIST),
+        ],
+        env=env
+    )
+
+
+def main():
+    logging.info("Slideshow gestartet")
+
+    current_hash = ""
+    feh_process = None
+
+    while True:
+
+        images = find_images()
+        new_hash = image_signature(images)
+
+        if new_hash != current_hash:
+
+            if images == [DEFAULT_IMAGE]:
+                logging.info(
+                    "Keine Bilder gefunden. Standardbild wird angezeigt."
+                )
+            else:
+                logging.info(
+                    f"{len(images)} Bilder gefunden."
+                )
+
+            write_filelist(images)
+
+            if feh_process:
+                feh_process.terminate()
+
+            feh_process = start_feh()
+
+            current_hash = new_hash
+
+        time.sleep(3)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Datei ausführbar machen:
+
+```bash
+chmod +x /opt/slideshow/slideshow.py
+```
+
+---
+
+# 8. Kiosk-Startskript erstellen
+
+Datei anlegen:
+
+```bash
+sudo nano /opt/slideshow/kiosk.sh
+```
+
+Inhalt:
+
+```bash
+#!/bin/bash
+
+xset s off
+xset -dpms
+xset s noblank
+
+unclutter -idle 0.5 -root &
+
+openbox-session &
+
+exec /opt/slideshow/slideshow.py
+```
+
+Datei ausführbar machen:
+
+```bash
+chmod +x /opt/slideshow/kiosk.sh
+```
+
+---
+
+# 9. Systemd-Service erstellen
+
+Datei anlegen:
+
+```bash
+sudo nano /etc/systemd/system/slideshow-kiosk.service
+```
+
+Inhalt:
+
+```ini
+[Unit]
+Description=USB Slideshow Kiosk
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=admin
+Group=admin
+
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/admin/.Xauthority
+
+ExecStart=/usr/bin/startx /opt/slideshow/kiosk.sh -- :0 -nocursor
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Aktivieren:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable slideshow-kiosk.service
+```
+
+---
+
+# 10. Bildschirm-Standby deaktivieren
 
 ```bash
 sudo raspi-config
@@ -118,12 +362,14 @@ sudo raspi-config
 Menü:
 
 ```text
-System Options
- └── Boot / Auto Login
-      └── Desktop Autologin
+Display Options
+ → Screen Blanking
+   → Disable
 ```
 
-Anschließend neu starten:
+---
+
+# 11. Neustart
 
 ```bash
 sudo reboot
@@ -131,261 +377,31 @@ sudo reboot
 
 ---
 
-# 7. Verzeichnisstruktur anlegen
+# 12. Logging
+
+Anwendungslog:
 
 ```bash
-mkdir -p /home/admin/slideshow
-mkdir -p /home/admin/slideshow/runtime
+tail -f /var/log/slideshow/slideshow.log
 ```
 
-Besitzer setzen:
+Service-Log:
 
 ```bash
-sudo chown -R admin:admin /home/admin/slideshow
+journalctl -u slideshow-kiosk.service -f
+```
+
+Status:
+
+```bash
+systemctl status slideshow-kiosk.service
 ```
 
 ---
 
-# 8. Standardbild erstellen
+# 13. Unterstützte Bildformate
 
-```bash
-convert \
-  -size 1920x1080 \
-  xc:black \
-  -fill white \
-  -gravity center \
-  -pointsize 60 \
-  -annotate 0 "Keine Bilder gefunden" \
-  /home/admin/slideshow/default.jpg
-```
-
----
-
-# 9. Slideshow-Skript erstellen
-
-Datei anlegen:
-
-```bash
-nano /home/admin/slideshow/slideshow.sh
-```
-
-Inhalt:
-
-```bash
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-DEFAULT_IMAGE="/home/admin/slideshow/default.jpg"
-WORKDIR="/home/admin/slideshow/runtime"
-LISTFILE="$WORKDIR/images.txt"
-PIDFILE="$WORKDIR/feh.pid"
-
-INTERVAL_SECONDS=10
-
-mkdir -p "$WORKDIR"
-
-start_feh() {
-
-    if [[ -f "$PIDFILE" ]]; then
-        OLD_PID=$(cat "$PIDFILE")
-
-        if kill -0 "$OLD_PID" 2>/dev/null; then
-            kill "$OLD_PID"
-            sleep 1
-        fi
-    fi
-
-    feh \
-        --fullscreen \
-        --hide-pointer \
-        --borderless \
-        --auto-zoom \
-        --slideshow-delay "$INTERVAL_SECONDS" \
-        --filelist "$1" &
-
-    echo $! > "$PIDFILE"
-}
-
-while true
-do
-
-    TMPFILE="$WORKDIR/images.new"
-    > "$TMPFILE"
-
-    for ROOT in /media/admin /run/media/admin
-    do
-        if [[ -d "$ROOT" ]]; then
-
-            find "$ROOT" -type f \
-            \( \
-                -iname "*.jpg" -o \
-                -iname "*.jpeg" -o \
-                -iname "*.png" -o \
-                -iname "*.gif" -o \
-                -iname "*.bmp" -o \
-                -iname "*.webp" -o \
-                -iname "*.tif" -o \
-                -iname "*.tiff" \
-            \) \
-            >> "$TMPFILE" 2>/dev/null
-        fi
-    done
-
-    if [[ ! -s "$TMPFILE" ]]; then
-        echo "$DEFAULT_IMAGE" > "$TMPFILE"
-    fi
-
-    NEW_HASH=$(sha256sum "$TMPFILE" | awk '{print $1}')
-
-    if [[ "${LAST_HASH:-}" != "$NEW_HASH" ]]; then
-
-        mv "$TMPFILE" "$LISTFILE"
-
-        start_feh "$LISTFILE"
-
-        LAST_HASH="$NEW_HASH"
-
-    else
-        rm -f "$TMPFILE"
-    fi
-
-    sleep 3
-
-done
-```
-
-Datei ausführbar machen:
-
-```bash
-chmod +x /home/admin/slideshow/slideshow.sh
-```
-
----
-
-# 10. systemd User Service erstellen
-
-Verzeichnis erstellen:
-
-```bash
-mkdir -p /home/admin/.config/systemd/user
-```
-
-Service-Datei anlegen:
-
-```bash
-nano /home/admin/.config/systemd/user/slideshow.service
-```
-
-Inhalt:
-
-```ini
-[Unit]
-Description=USB Slideshow Viewer
-After=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=/home/admin/slideshow/slideshow.sh
-Restart=always
-RestartSec=3
-Environment=DISPLAY=:0
-
-[Install]
-WantedBy=default.target
-```
-
-Aktivieren:
-
-```bash
-systemctl --user daemon-reload
-systemctl --user enable slideshow.service
-systemctl --user start slideshow.service
-```
-
-Linger aktivieren:
-
-```bash
-sudo loginctl enable-linger admin
-```
-
----
-
-# 11. Bildschirmabschaltung deaktivieren
-
-Verzeichnis anlegen:
-
-```bash
-mkdir -p /home/admin/.config/lxsession/LXDE-pi
-```
-
-Datei erstellen:
-
-```bash
-nano /home/admin/.config/lxsession/LXDE-pi/autostart
-```
-
-Inhalt:
-
-```text
-@xset s off
-@xset -dpms
-@xset s noblank
-```
-
----
-
-# 12. Neustart
-
-```bash
-sudo reboot
-```
-
----
-
-# 13. Funktionstest
-
-## Test 1
-
-System ohne USB-Stick starten.
-
-**Erwartung:**
-
-* Standardbild wird angezeigt.
-
----
-
-## Test 2
-
-USB-Stick mit Bildern einstecken.
-
-**Erwartung:**
-
-* Slideshow startet automatisch.
-
----
-
-## Test 3
-
-USB-Stick entfernen.
-
-**Erwartung:**
-
-* Nach wenigen Sekunden wird wieder das Standardbild angezeigt.
-
----
-
-## Test 4
-
-USB-Stick ohne Bilder einstecken.
-
-**Erwartung:**
-
-* Standardbild bleibt sichtbar.
-
----
-
-# 14. Unterstützte Bildformate
+Die Anwendung sucht rekursiv nach:
 
 ```text
 jpg
@@ -398,81 +414,65 @@ tif
 tiff
 ```
 
----
-
-# 15. Service überwachen
-
-Status:
-
-```bash
-systemctl --user status slideshow.service
-```
-
-Logs:
-
-```bash
-journalctl --user -u slideshow.service -f
-```
+Unterordner werden automatisch durchsucht.
 
 ---
 
-# 16. Fehleranalyse
+# 14. Verhalten
 
-## USB-Stick erkannt?
-
-```bash
-lsblk
-```
-
-```bash
-mount | grep media
-```
-
----
-
-## mDNS prüfen
-
-```bash
-systemctl status avahi-daemon
-```
-
-```bash
-avahi-resolve-host-name SlideShow.local
-```
+| Ereignis                        | Verhalten                         |
+| ------------------------------- | --------------------------------- |
+| Raspberry startet mit USB-Stick | Bilder werden angezeigt           |
+| USB-Stick enthält keine Bilder  | Standardbild                      |
+| USB-Stick wird entfernt         | Standardbild                      |
+| USB-Stick wird eingesteckt      | Bilder werden automatisch erkannt |
+| Bilder werden ergänzt           | Slideshow wird neu geladen        |
+| Fehler                          | Eintrag im Logfile                |
 
 ---
 
-## Slideshow prüfen
+# 15. Wartung
+
+Service neu starten:
 
 ```bash
-journalctl --user -u slideshow.service -n 100
+sudo systemctl restart slideshow-kiosk.service
 ```
 
+Service stoppen:
+
 ```bash
-cat /home/admin/slideshow/runtime/images.txt
+sudo systemctl stop slideshow-kiosk.service
+```
+
+Service deaktivieren:
+
+```bash
+sudo systemctl disable slideshow-kiosk.service
+```
+
+Logfile leeren:
+
+```bash
+sudo truncate -s 0 /var/log/slideshow/slideshow.log
 ```
 
 ---
 
 # Ergebnis
 
-Nach Abschluss der Installation erfüllt das System folgende Anforderungen:
+Nach dem Einschalten startet der Raspberry Pi automatisch in den Kiosk-Modus und zeigt:
 
-✅ Verbindung zum WLAN `WLAN`
+* Bilder vom USB-Stick
+* automatisch aktualisierte Inhalte nach Einstecken/Entfernen
+* Standardbild bei fehlenden Bildern
+* Logfiles zur Diagnose
 
-✅ Hostname `SlideShow`
+Der Raspberry Pi ist über mDNS erreichbar unter:
 
-✅ Erreichbar über `SlideShow.local`
-
-✅ Automatische Bildersuche auf USB-Sticks
-
-✅ Anzeige von JPG, PNG, GIF, BMP, WEBP und TIFF
-
-✅ Standardbild bei fehlendem USB-Stick
-
-✅ Standardbild bei fehlenden Bildern
-
-✅ Automatische Umschaltung beim Einstecken oder Entfernen eines USB-Sticks
+```text
+SlideShow.local
+```
 
 
 =====================
