@@ -344,6 +344,33 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
+Neu:
+
+```ini
+[Unit]
+Description=USB Slideshow Kiosk
+After=systemd-user-sessions.service local-fs.target
+
+[Service]
+User=admin
+Group=admin
+WorkingDirectory=/home/admin
+
+ExecStartPre=/bin/sleep 5
+
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/admin/.Xauthority
+
+ExecStart=/usr/bin/startx /opt/slideshow/kiosk.sh -- :0 -nocursor
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
 Aktivieren:
 
 ```bash
