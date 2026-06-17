@@ -171,6 +171,7 @@ IMAGE_EXTENSIONS = {
 }
 
 MEDIA_ROOTS = [
+    Path("/data/slideshow"),
     Path("/media/admin"),
     Path("/media"),
     Path("/mnt")
