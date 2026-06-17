@@ -1,3 +1,483 @@
+# Raspberry Pi 3B USB Slideshow Viewer
+
+## Ziel
+
+Ein Raspberry Pi 3B mit Raspberry Pi OS Bookworm soll automatisch Bilder von einem USB-Stick als Slideshow anzeigen.
+
+### Anforderungen
+
+* WLAN-Verbindung zur SSID `WLAN`
+* Hostname `SlideShow`
+* Erreichbarkeit per mDNS unter `SlideShow.local`
+* Automatische Bildanzeige von USB-Sticks
+* Unterstützung der gängigsten Bildformate
+* Anzeige eines Standardbildes wenn:
+
+  * kein USB-Stick vorhanden ist
+  * keine Bilder auf dem USB-Stick gefunden werden
+* Automatische Reaktion auf Einstecken und Entfernen von USB-Sticks
+
+---
+
+# 1. System aktualisieren
+
+```bash
+sudo apt update
+sudo apt full-upgrade -y
+sudo reboot
+```
+
+---
+
+# 2. WLAN konfigurieren
+
+Verbindung mit der SSID `WLAN` herstellen:
+
+```bash
+sudo nmcli dev wifi connect "WLAN" password "DEIN_PASSWORT"
+```
+
+Verbindung prüfen:
+
+```bash
+nmcli connection show
+ip addr show wlan0
+```
+
+---
+
+# 3. Hostname konfigurieren
+
+Hostname setzen:
+
+```bash
+sudo hostnamectl set-hostname SlideShow
+```
+
+Neustart durchführen:
+
+```bash
+sudo reboot
+```
+
+---
+
+# 4. mDNS (Avahi) installieren
+
+Installation:
+
+```bash
+sudo apt install -y avahi-daemon avahi-utils
+```
+
+Dienst aktivieren:
+
+```bash
+sudo systemctl enable --now avahi-daemon
+```
+
+Status prüfen:
+
+```bash
+systemctl status avahi-daemon
+```
+
+Danach sollte der Raspberry Pi erreichbar sein über:
+
+```text
+SlideShow.local
+```
+
+Test:
+
+```bash
+ping SlideShow.local
+```
+
+---
+
+# 5. Benötigte Pakete installieren
+
+```bash
+sudo apt install -y \
+    feh \
+    udisks2 \
+    imagemagick \
+    rsync \
+    x11-xserver-utils
+```
+
+---
+
+# 6. Automatischen Desktop-Login aktivieren
+
+```bash
+sudo raspi-config
+```
+
+Menü:
+
+```text
+System Options
+ └── Boot / Auto Login
+      └── Desktop Autologin
+```
+
+Anschließend neu starten:
+
+```bash
+sudo reboot
+```
+
+---
+
+# 7. Verzeichnisstruktur anlegen
+
+```bash
+mkdir -p /home/admin/slideshow
+mkdir -p /home/admin/slideshow/runtime
+```
+
+Besitzer setzen:
+
+```bash
+sudo chown -R admin:admin /home/admin/slideshow
+```
+
+---
+
+# 8. Standardbild erstellen
+
+```bash
+convert \
+  -size 1920x1080 \
+  xc:black \
+  -fill white \
+  -gravity center \
+  -pointsize 60 \
+  -annotate 0 "Keine Bilder gefunden" \
+  /home/admin/slideshow/default.jpg
+```
+
+---
+
+# 9. Slideshow-Skript erstellen
+
+Datei anlegen:
+
+```bash
+nano /home/admin/slideshow/slideshow.sh
+```
+
+Inhalt:
+
+```bash
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DEFAULT_IMAGE="/home/admin/slideshow/default.jpg"
+WORKDIR="/home/admin/slideshow/runtime"
+LISTFILE="$WORKDIR/images.txt"
+PIDFILE="$WORKDIR/feh.pid"
+
+INTERVAL_SECONDS=10
+
+mkdir -p "$WORKDIR"
+
+start_feh() {
+
+    if [[ -f "$PIDFILE" ]]; then
+        OLD_PID=$(cat "$PIDFILE")
+
+        if kill -0 "$OLD_PID" 2>/dev/null; then
+            kill "$OLD_PID"
+            sleep 1
+        fi
+    fi
+
+    feh \
+        --fullscreen \
+        --hide-pointer \
+        --borderless \
+        --auto-zoom \
+        --slideshow-delay "$INTERVAL_SECONDS" \
+        --filelist "$1" &
+
+    echo $! > "$PIDFILE"
+}
+
+while true
+do
+
+    TMPFILE="$WORKDIR/images.new"
+    > "$TMPFILE"
+
+    for ROOT in /media/admin /run/media/admin
+    do
+        if [[ -d "$ROOT" ]]; then
+
+            find "$ROOT" -type f \
+            \( \
+                -iname "*.jpg" -o \
+                -iname "*.jpeg" -o \
+                -iname "*.png" -o \
+                -iname "*.gif" -o \
+                -iname "*.bmp" -o \
+                -iname "*.webp" -o \
+                -iname "*.tif" -o \
+                -iname "*.tiff" \
+            \) \
+            >> "$TMPFILE" 2>/dev/null
+        fi
+    done
+
+    if [[ ! -s "$TMPFILE" ]]; then
+        echo "$DEFAULT_IMAGE" > "$TMPFILE"
+    fi
+
+    NEW_HASH=$(sha256sum "$TMPFILE" | awk '{print $1}')
+
+    if [[ "${LAST_HASH:-}" != "$NEW_HASH" ]]; then
+
+        mv "$TMPFILE" "$LISTFILE"
+
+        start_feh "$LISTFILE"
+
+        LAST_HASH="$NEW_HASH"
+
+    else
+        rm -f "$TMPFILE"
+    fi
+
+    sleep 3
+
+done
+```
+
+Datei ausführbar machen:
+
+```bash
+chmod +x /home/admin/slideshow/slideshow.sh
+```
+
+---
+
+# 10. systemd User Service erstellen
+
+Verzeichnis erstellen:
+
+```bash
+mkdir -p /home/admin/.config/systemd/user
+```
+
+Service-Datei anlegen:
+
+```bash
+nano /home/admin/.config/systemd/user/slideshow.service
+```
+
+Inhalt:
+
+```ini
+[Unit]
+Description=USB Slideshow Viewer
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/admin/slideshow/slideshow.sh
+Restart=always
+RestartSec=3
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=default.target
+```
+
+Aktivieren:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable slideshow.service
+systemctl --user start slideshow.service
+```
+
+Linger aktivieren:
+
+```bash
+sudo loginctl enable-linger admin
+```
+
+---
+
+# 11. Bildschirmabschaltung deaktivieren
+
+Verzeichnis anlegen:
+
+```bash
+mkdir -p /home/admin/.config/lxsession/LXDE-pi
+```
+
+Datei erstellen:
+
+```bash
+nano /home/admin/.config/lxsession/LXDE-pi/autostart
+```
+
+Inhalt:
+
+```text
+@xset s off
+@xset -dpms
+@xset s noblank
+```
+
+---
+
+# 12. Neustart
+
+```bash
+sudo reboot
+```
+
+---
+
+# 13. Funktionstest
+
+## Test 1
+
+System ohne USB-Stick starten.
+
+**Erwartung:**
+
+* Standardbild wird angezeigt.
+
+---
+
+## Test 2
+
+USB-Stick mit Bildern einstecken.
+
+**Erwartung:**
+
+* Slideshow startet automatisch.
+
+---
+
+## Test 3
+
+USB-Stick entfernen.
+
+**Erwartung:**
+
+* Nach wenigen Sekunden wird wieder das Standardbild angezeigt.
+
+---
+
+## Test 4
+
+USB-Stick ohne Bilder einstecken.
+
+**Erwartung:**
+
+* Standardbild bleibt sichtbar.
+
+---
+
+# 14. Unterstützte Bildformate
+
+```text
+jpg
+jpeg
+png
+gif
+bmp
+webp
+tif
+tiff
+```
+
+---
+
+# 15. Service überwachen
+
+Status:
+
+```bash
+systemctl --user status slideshow.service
+```
+
+Logs:
+
+```bash
+journalctl --user -u slideshow.service -f
+```
+
+---
+
+# 16. Fehleranalyse
+
+## USB-Stick erkannt?
+
+```bash
+lsblk
+```
+
+```bash
+mount | grep media
+```
+
+---
+
+## mDNS prüfen
+
+```bash
+systemctl status avahi-daemon
+```
+
+```bash
+avahi-resolve-host-name SlideShow.local
+```
+
+---
+
+## Slideshow prüfen
+
+```bash
+journalctl --user -u slideshow.service -n 100
+```
+
+```bash
+cat /home/admin/slideshow/runtime/images.txt
+```
+
+---
+
+# Ergebnis
+
+Nach Abschluss der Installation erfüllt das System folgende Anforderungen:
+
+✅ Verbindung zum WLAN `WLAN`
+
+✅ Hostname `SlideShow`
+
+✅ Erreichbar über `SlideShow.local`
+
+✅ Automatische Bildersuche auf USB-Sticks
+
+✅ Anzeige von JPG, PNG, GIF, BMP, WEBP und TIFF
+
+✅ Standardbild bei fehlendem USB-Stick
+
+✅ Standardbild bei fehlenden Bildern
+
+✅ Automatische Umschaltung beim Einstecken oder Entfernen eines USB-Sticks
+
+
+
+-----
+
 
 # Raspberry Pi Slideshow Viewer
 
