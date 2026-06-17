@@ -117,6 +117,8 @@ sudo mkdir -p /opt/slideshow
 sudo chown -R admin:admin /opt/slideshow
 
 sudo mkdir -p /data/slideshow
+sudo chown admin:admin /data/slideshow
+sudo chmod 755 /data/slideshow
 
 sudo mkdir -p /var/log/slideshow
 sudo chown -R admin:admin /var/log/slideshow
@@ -137,6 +139,81 @@ convert \
   /opt/slideshow/default.jpg
 ```
 
+
+# Mount script
+
+```bash
+sudo nano /usr/local/sbin/mount-slideshow-usb.sh
+```
+
+Inhalt:
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+MOUNTPOINT="/data/slideshow"
+USER_NAME="admin"
+GROUP_NAME="admin"
+
+mkdir -p "$MOUNTPOINT"
+
+# Schon gemountet? Dann nichts tun.
+if findmnt -rn "$MOUNTPOINT" >/dev/null; then
+  exit 0
+fi
+
+# Erstes USB-Blockdevice mit Filesystem suchen
+DEV="$(lsblk -rpno NAME,TRAN,TYPE,FSTYPE \
+  | awk '$2=="usb" && $3=="part" && $4!="" {print $1; exit}')"
+
+[ -n "${DEV:-}" ] || exit 0
+
+FSTYPE="$(blkid -o value -s TYPE "$DEV")"
+UID_NUM="$(id -u "$USER_NAME")"
+GID_NUM="$(id -g "$GROUP_NAME")"
+
+case "$FSTYPE" in
+  vfat|exfat|ntfs)
+    mount -t "$FSTYPE" \
+      -o rw,nosuid,nodev,noexec,uid="$UID_NUM",gid="$GID_NUM",umask=022 \
+      "$DEV" "$MOUNTPOINT"
+    ;;
+  ext2|ext3|ext4)
+    mount -t "$FSTYPE" \
+      -o rw,nosuid,nodev,noexec \
+      "$DEV" "$MOUNTPOINT"
+    ;;
+  *)
+    mount -o rw,nosuid,nodev,noexec "$DEV" "$MOUNTPOINT"
+    ;;
+esac
+
+chown "$USER_NAME:$GROUP_NAME" "$MOUNTPOINT" || true
+```
+
+```bash
+sudo chmod +x /usr/local/sbin/mount-slideshow-usb.sh
+```
+
+# 3. systemd-Service
+
+```bash
+sudo nano /etc/systemd/system/slideshow-usb-mount.service
+```
+
+Inhalt:
+
+```INI
+[Unit]
+Description=Mount USB stick for slideshow
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mount-slideshow-usb.sh```
+
+
 ---
 
 # 7. Slideshow-Anwendung erstellen
@@ -145,6 +222,44 @@ Datei anlegen:
 
 ```bash
 sudo nano /opt/slideshow/slideshow.py
+```
+
+aktivieren:
+```bash
+sudo systemctl daemon-reload
+```
+
+# 4. udev-Regel
+
+```bash
+sudo nano /etc/udev/rules.d/90-slideshow-usb.rules
+```
+
+Inhalt:
+```bash
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", TAG+="systemd", ENV{SYSTEMD_WANTS}+="slideshow-usb-mount.service"
+ACTION=="remove", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/bin/umount -l /data/slideshow"
+```
+
+Laden: 
+
+```bash
+sudo udevadm control --reload
+sudo udevadm trigger
+```
+
+# 5. Test
+
+Stick einstecken:
+
+```bash
+findmnt /data/slideshow
+ls -la /data/slideshow
+sudo -u admin python3 -c 'import os; print(os.listdir("/data/slideshow"))'
+```
+Wichtig: Bei FAT/exFAT/NTFS erzwingen die Mount-Optionen uid=admin,gid=admin passende Rechte. Bei ext4-Sticks kommen die Rechte aus dem Dateisystem selbst; falls Python als admin nichts lesen kann, einmalig auf dem Stick ausführen:
+```bash
+sudo chown -R admin:admin /data/slideshow
 ```
 
 Inhalt:
