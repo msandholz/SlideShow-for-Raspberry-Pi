@@ -96,10 +96,29 @@ sudo apt install -y \
 # 5. Verzeichnisstruktur anlegen
 
 ```bash
-sudo mkdir -p /opt/slideshow
-sudo mkdir -p /var/log/slideshow
+/opt/slideshow/
+├── slideshow.py
+├── kiosk.sh
+├── default.jpg
+└── config/
 
+/data/slideshow/
+├── sda1/
+├── sdb1/
+└── sdc1/
+
+/var/log/slideshow/
+├── slideshow.log
+└── usb-mount.log
+```
+
+```bash
+sudo mkdir -p /opt/slideshow
 sudo chown -R admin:admin /opt/slideshow
+
+sudo mkdir -p /data/slideshow
+
+sudo mkdir -p /var/log/slideshow
 sudo chown -R admin:admin /var/log/slideshow
 ```
 
