@@ -1,13 +1,31 @@
-import subprocess
+#!/usr/bin/env python3
 
-result = subprocess.run(
-    ["findmnt", "/data/slideshow"],
-    capture_output=True,
-    text=True
-)
+from pathlib import Path
 
-if result.returncode == 0:
-    print("Mount vorhanden")
-    print(result.stdout)
-else:
-    print("Kein Mount vorhanden")
+IMAGE_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".webp",
+    ".tif",
+    ".tiff"
+}
+
+USB_ROOT = Path("/data/slideshow")
+
+images = []
+
+for file in USB_ROOT.rglob("*"):
+
+    if file.is_file():
+
+        if file.suffix.lower() in IMAGE_EXTENSIONS:
+
+            images.append(file)
+
+print(f"{len(images)} Bild(er) gefunden:\n")
+
+for image in images:
+    print(image)
