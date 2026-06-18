@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DISPLAY=:0
+
 # Bildschirmschoner deaktivieren
 xset s off
 xset -dpms
