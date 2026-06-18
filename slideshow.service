@@ -1,16 +1,13 @@
 [Unit]
 Description=USB Slideshow
-After=systemd-user-sessions.service
+After=multi-user.target
 
 [Service]
 User=admin
 Group=admin
 WorkingDirectory=/opt/slideshow
 
-Environment=DISPLAY=:0
-Environment=XAUTHORITY=/home/admin/.Xauthority
-
-ExecStart=/usr/bin/startx /opt/slideshow/slideshow.sh -- :0 -nocursor
+ExecStart=/usr/bin/startx /usr/bin/python3 /opt/slideshow/slideshow.py -- :0
 
 Restart=always
 RestartSec=5
