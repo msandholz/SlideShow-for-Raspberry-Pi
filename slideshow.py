@@ -132,10 +132,7 @@ def main():
 
             if images == [DEFAULT_IMAGE]:
                 logging.info("Keine Bilder gefunden. Standardbild wird angezeigt.")
-                 if feh_process:
-                    feh_process.terminate()
-
-                    feh_process = show_default()
+                feh_process = show_default()
 
             else:
                 logging.info(
