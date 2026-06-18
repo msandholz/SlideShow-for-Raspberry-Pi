@@ -82,7 +82,7 @@ ip a
 
 ---
 ## 2. Verzeichnisstruktur anlegen
-### 2.1 Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
+Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
 ```bash
 Executeable Files:
 /opt/slideshow/
@@ -112,35 +112,33 @@ udev Rules:
 └── 90-slideshow-usb.rules
 ```
 
-### 2.2 Ordner für die Executeables anlegen:
+### 2.1 Ordner für die Executeables anlegen:
 ```bash
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
 
-### 2.3 Ordner für Log-Files anlegen:
+### 2.2 Ordner für Log-Files anlegen:
 ```bash
 sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
 ```
-### 2.4  Ordner für USB-Stick anlegen:
+### 2.3  Ordner für USB-Stick anlegen:
 ```bash
 sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
 ```
 
 ---
-
 ## 3. Local image "default.png" generieren/laden und testen
-
-### 3.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
 
-### 3.2Testscript laden
+Testscript laden
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test_default-png.sh -o /opt/slideshow/default.png
 ```
 
-### 3.3 Standardbild testen
+Standardbild testen
 ```bash
 python3 /opt/slideshow/test_default_png.py
 ```
