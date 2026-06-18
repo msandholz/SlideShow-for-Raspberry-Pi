@@ -95,13 +95,27 @@ def start_feh():
             str(SLIDE_DELAY),
             "--reload",
             "5",
-            "--randomize",
             "--filelist",
             str(FILELIST),
         ],
         env=env
     )
 
+def show_default(): 
+    env = os.environ.copy()
+    env["DISPLAY"] = ":0"
+
+    return subprocess.run(
+        [
+            "feh",
+            "--fullscreen",
+            "--auto-zoom",
+            "--borderless",
+            "--hide-pointer",
+            DEFAULT_IMAGE
+        ],
+        env=env
+    )
 
 def main():
     logging.info("Slideshow gestartet")
@@ -117,9 +131,12 @@ def main():
         if new_hash != current_hash:
 
             if images == [DEFAULT_IMAGE]:
-                logging.info(
-                    "Keine Bilder gefunden. Standardbild wird angezeigt."
-                )
+                logging.info("Keine Bilder gefunden. Standardbild wird angezeigt.")
+                 if feh_process:
+                    feh_process.terminate()
+
+                    feh_process = show_default()
+
             else:
                 logging.info(
                     f"{len(images)} Bilder gefunden."
