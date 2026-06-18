@@ -47,32 +47,9 @@ Danach sollte der Raspberry Pi erreichbar sein über:
 ```text
 SlideShow.local
 ```
----
 
 
-
-
-## 2. WLAN konfigurieren
-
-SSID: `WLAN`
-
-```bash
-sudo nmcli dev wifi connect "WLAN" password "DEIN_PASSWORT"
-```
-
-Verbindung prüfen:
-
-```bash
-nmcli connection show
-ip a
-```
-
----
-
-## 3. 
----
-
-## 4. Benötigte Software installieren
+### 1.3 Benötigte Software installieren
 
 ```bash
 sudo apt install -y \
@@ -89,9 +66,24 @@ sudo apt install -y \
 ```
 
 ---
+## 2. WLAN konfigurieren
 
-## 5. Verzeichnisstruktur anlegen
-### 5.1 Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
+SSID: `WLAN`
+
+```bash
+sudo nmcli dev wifi connect "WLAN" password "DEIN_PASSWORT"
+```
+
+Verbindung prüfen:
+
+```bash
+nmcli connection show
+ip a
+```
+
+---
+## 2. Verzeichnisstruktur anlegen
+### 2.1 Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
 ```bash
 Executeable Files:
 /opt/slideshow/
@@ -121,25 +113,25 @@ udev Rules:
 └── 90-slideshow-usb.rules
 ```
 
-### 5.2 Ordner für die Executeables anlegen:
+### 2.2 Ordner für die Executeables anlegen:
 ```bash
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
-### 5.3 Ordner für Log-Files anlegen:
+### 2.3 Ordner für Log-Files anlegen:
 ```bash
 sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
 ```
-### 5.4  Ordner für USB-Stick anlegen:
+### 2.4  Ordner für USB-Stick anlegen:
 ```bash
 sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
 ```
 
-## 6. Standardbild erzeugen bzw. default.png hochladen
-### 6.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+## 3. Standardbild erzeugen bzw. default.png hochladen
+### 3.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
-### 6.2 Alternativ: Standardbild "default.png" generieren
+### 3.2 Alternativ: Standardbild "default.png" generieren
 ```bash
 convert \
   -size 1920x1080 \
