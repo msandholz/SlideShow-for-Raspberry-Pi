@@ -90,7 +90,6 @@ Executeable Files:
 ├── default1.jpg
 ├── test-default-jpg.py
 ├── mount-usb.sh
-├── slideshow.sh
 └── slideshow.py
 
 Log Files:
@@ -111,7 +110,7 @@ Systemd Services:
 
 udev Rules:
 /etc/udev/rules.d/
-└── 90-slideshow-usb.rules
+└── 99-slideshow-usb.rules
 ```
 
 ### 2.1 Ordner anlegen
