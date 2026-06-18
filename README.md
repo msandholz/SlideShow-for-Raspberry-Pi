@@ -19,15 +19,38 @@ Ein Raspberry Pi 3B mit Raspberry Pi OS Bookworm soll als robuster Slideshow-Vie
 
 ---
 
-## 1. System aktualisieren
-
+## 1. System aktualisieren und konfigurieren
+### 1.1 System akutalisieren
 ```bash
 sudo apt update
 sudo apt -y full-upgrade
 sudo reboot
 ```
 
+### 1.2 Hostname und mDNS konfigurieren
+Hostname setzen:
+```bash
+sudo hostnamectl set-hostname SlideShow
+```
+
+Avahi installieren:
+```bash
+sudo apt install -y avahi-daemon && sudo systemctl enable --now avahi-daemon
+```
+
+Neustart:
+```bash
+sudo reboot
+```
+
+Danach sollte der Raspberry Pi erreichbar sein über:
+```text
+SlideShow.local
+```
 ---
+
+
+
 
 ## 2. WLAN konfigurieren
 
@@ -46,33 +69,7 @@ ip a
 
 ---
 
-## 3. Hostname und mDNS konfigurieren
-
-Hostname setzen:
-
-```bash
-sudo hostnamectl set-hostname SlideShow
-```
-
-Avahi installieren:
-
-```bash
-sudo apt install -y avahi-daemon
-sudo systemctl enable --now avahi-daemon
-```
-
-Neustart:
-
-```bash
-sudo reboot
-```
-
-Danach sollte der Raspberry Pi erreichbar sein über:
-
-```text
-SlideShow.local
-```
-
+## 3. 
 ---
 
 ## 4. Benötigte Software installieren
