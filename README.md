@@ -130,20 +130,20 @@ sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo 
 ```
 
 ---
-## 3. Local image "default.png" generieren/laden und testen
-- Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+## 3. Local image "default.jpg" generieren/laden und testen
+- Standardbild "default.jpg" von GitHub ins Verzeichnis "/opt/slideshow/" laden
 ```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.jpg -o /opt/slideshow/default.jpg
 ```
 
 - Testscript laden
 ```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test_default-png.sh -o /opt/slideshow/default.png
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test-default-jpg.py -o /opt/slideshow/test-default-jpg.py
 ```
 
 - Standardbild testen
 ```bash
-python3 /opt/slideshow/test_default_png.py
+python3 /opt/slideshow/test-default-jpg.py
 ```
 
 ### 3.1  Alternativ: Standardbild "default.png" generieren
@@ -155,12 +155,12 @@ convert \
   -fill white \
   -pointsize 60 \
   -annotate 0 "Please insert USB-Stick!" \
-  /opt/slideshow/default.png
+  /opt/slideshow/default.jpg
 ```
 
 ### 3.2  Alternativ: Python Script "test_default_png.py" manuell anlegen
 ```bash
-sudo nano /opt/slideshow/test_default_png.py
+sudo nano /opt/slideshow/test-default-jpg.py
 ```
 Inhalt:
 ```bash
@@ -170,7 +170,7 @@ import os
 import subprocess
 from pathlib import Path
 
-IMAGE = "/opt/slideshow/default.png"
+IMAGE = "/opt/slideshow/default.jpg"
 
 print(f"DISPLAY={os.environ.get('DISPLAY')}")
 print(f"XAUTHORITY={os.environ.get('XAUTHORITY')}")
