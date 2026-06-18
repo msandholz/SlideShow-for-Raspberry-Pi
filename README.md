@@ -143,7 +143,7 @@ Standardbild testen
 python3 /opt/slideshow/test_default_png.py
 ```
 
-### Alternativ: Standardbild "default.png" generieren
+### 3.1  Alternativ: Standardbild "default.png" generieren
 ```bash
 convert \
   -size 1920x1080 \
@@ -155,7 +155,7 @@ convert \
   /opt/slideshow/default.png
 ```
 
-#### Alternativ: Python Script manuell anlegen
+#### 3.2  Alternativ: Python Script manuell anlegen
 ```bash
 sudo nano /opt/slideshow/test_default_png.py
 ```
@@ -186,7 +186,7 @@ subprocess.run([
 
 ---
 
-## 3. Mount script
+## 4. Mounting USB-Stick
 
 ```bash
 sudo nano /usr/local/sbin/mount-usb.sh
