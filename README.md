@@ -117,6 +117,13 @@ udev Rules:
 ```bash
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
+
+### 2.2.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
+```
+
+
 ### 2.3 Ordner für Log-Files anlegen:
 ```bash
 sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
@@ -125,6 +132,10 @@ sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
 ```bash
 sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
 ```
+
+
+---
+
 
 ## 3. Standardbild erzeugen bzw. default.png hochladen
 ### 3.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
