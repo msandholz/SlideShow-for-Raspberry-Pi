@@ -301,6 +301,9 @@ After=local-fs.target
 [Service]
 Type=oneshot
 ExecStart=/opt/slideshow/mount-usb.sh
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 
