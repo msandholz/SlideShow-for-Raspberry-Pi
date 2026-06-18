@@ -468,27 +468,7 @@ Datei ausführbar machen:
 chmod +x /opt/slideshow/slideshow.py
 ```
 
-### 5.2 Alternativ: Datei "slideshow.sh" manuell anlegen
-Datei anlegen:
-```bash
-sudo nano /opt/slideshow/kioskmode.sh
-```
-Inhalt:
-```bash
-#!/bin/bash
-
-xset s off
-xset -dpms
-xset s noblank
-
-unclutter -idle 0.5 -root &
-
-openbox-session &
-
-exec /opt/slideshow/slideshow.py
-```
-
-### 5.3 Alternativ: Systemd-Service "slideshow.service" manuell erstellen
+### 5.2 Alternativ: Systemd-Service "slideshow.service" manuell erstellen
 Datei anlegen:
 ```bash
 sudo nano /etc/systemd/system/slideshow.service
@@ -523,6 +503,7 @@ Aktivieren:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable slideshow.service
+sudo systemctl start slideshow.service
 ```
 
 ---
