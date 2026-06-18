@@ -220,9 +220,16 @@ Laden:
 sudo udevadm control --reload
 sudo udevadm trigger
 ```
-
-
-
+- Testen:
+```bash
+findmnt /data/slideshow
+ls -la /data/slideshow
+sudo -u admin python3 -c 'import os; print(os.listdir("/data/slideshow"))'
+```
+Wichtig: Bei FAT/exFAT/NTFS erzwingen die Mount-Optionen uid=admin,gid=admin passende Rechte. Bei ext4-Sticks kommen die Rechte aus dem Dateisystem selbst; falls Python als admin nichts lesen kann, einmalig auf dem Stick ausführen:
+```bash
+sudo chown -R admin:admin /data/slideshow
+```
 
 
 ### 4.1 Alternativ: Script "mount-usb.sh" manuell anlegen  
@@ -322,10 +329,7 @@ findmnt /data/slideshow
 ls -la /data/slideshow
 sudo -u admin python3 -c 'import os; print(os.listdir("/data/slideshow"))'
 ```
-Wichtig: Bei FAT/exFAT/NTFS erzwingen die Mount-Optionen uid=admin,gid=admin passende Rechte. Bei ext4-Sticks kommen die Rechte aus dem Dateisystem selbst; falls Python als admin nichts lesen kann, einmalig auf dem Stick ausführen:
-```bash
-sudo chown -R admin:admin /data/slideshow
-```
+
 
 Inhalt:
 
