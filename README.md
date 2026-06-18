@@ -128,13 +128,24 @@ sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo 
 
 ---
 
-## 3. Local image "default.png"
+## 3. Local image "default.png" generieren/laden und testen
+
 ### 3.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
 
-### 3.2 Alternativ: Standardbild "default.png" generieren
+### 3.2Testscript laden
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test_default-png.sh -o /opt/slideshow/default.png
+```
+
+### 3.3 Standardbild testen
+```bash
+python3 /opt/slideshow/test_default_png.py
+```
+
+### Alternativ: Standardbild "default.png" generieren
 ```bash
 convert \
   -size 1920x1080 \
@@ -146,17 +157,7 @@ convert \
   /opt/slideshow/default.png
 ```
 
-### 3.3 Standardbild testen
-```bash
-python3 /opt/slideshow/test_default_png.py
-```
-
-#### 3.3.1 Test Script herunterladen
-```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test_default-png.sh -o /opt/slideshow/default.png
-```
-
-#### 3.3.2 Alternativ: Python Script manuell anlegen
+#### Alternativ: Python Script manuell anlegen
 ```bash
 sudo nano /opt/slideshow/test_default_png.py
 ```
