@@ -161,7 +161,7 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 # Mount script
 
 ```bash
-sudo nano /usr/local/sbin/mount-slideshow-usb.sh
+sudo nano /usr/local/sbin/mount-usb.sh
 ```
 
 Inhalt:
@@ -217,7 +217,7 @@ sudo chmod +x /usr/local/sbin/mount-slideshow-usb.sh
 # 3. systemd-Service
 
 ```bash
-sudo nano /etc/systemd/system/slideshow-usb-mount.service
+sudo nano /etc/systemd/system/mount-usb.service
 ```
 
 Inhalt:
