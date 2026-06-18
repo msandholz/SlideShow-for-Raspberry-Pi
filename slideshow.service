@@ -1,19 +1,20 @@
 [Unit]
 Description=USB Slideshow
-After=multi-user.target
+After=graphical.target
 
 [Service]
 User=admin
 Group=admin
+
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/admin/.Xauthority
+
 WorkingDirectory=/opt/slideshow
 
-ExecStart=/usr/bin/startx /usr/bin/python3 /opt/slideshow/slideshow.py -- :0
+ExecStart=/usr/bin/python3 /opt/slideshow/slideshow.py -- :0
 
 Restart=always
 RestartSec=5
 
-StandardOutput=journal
-StandardError=journal
-
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
