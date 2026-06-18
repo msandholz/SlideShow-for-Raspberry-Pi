@@ -4,8 +4,6 @@ After=graphical.target
 
 [Service]
 User=admin
-Group=admin
-
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/admin/.Xauthority
 
