@@ -96,20 +96,38 @@ sudo apt install -y \
 # 5. Verzeichnisstruktur anlegen
 
 ```bash
+
+Executeable Files:
 /opt/slideshow/
 ├── slideshow.py
 ├── kiosk.sh
+├── mount-usb.sh
 ├── default.jpg
 └── config/
 
+Log Files:
+/var/log/slideshow/
+├── slideshow.log
+└── mount-usb.log
+
+Pictures:
 /data/slideshow/
 ├── sda1/
 ├── sdb1/
 └── sdc1/
 
-/var/log/slideshow/
-├── slideshow.log
-└── usb-mount.log
+Systemd Services:
+/etc/systemd/system/
+├── mount-usb.service
+└── ----
+
+udev Rules:
+/etc/udev/rules.d/
+└── 90-slideshow-usb.rules
+
+
+
+
 ```
 
 ```bash
@@ -211,7 +229,9 @@ After=local-fs.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/mount-slideshow-usb.sh```
+ExecStart=/opt/slideshow/mount-usb.sh
+
+```
 
 
 ---
