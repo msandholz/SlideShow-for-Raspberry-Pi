@@ -334,7 +334,7 @@ chmod +x /opt/slideshow/slideshow.sh
 
 - systemd-Service "slideshow.service" herunterladen
 ```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.service -o /etc/systemd/system/slideshow.service
+sudo curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.service -o /etc/systemd/system/slideshow.service
 ```
 - systemd-service "slideshow.service" starten
 ```bash
