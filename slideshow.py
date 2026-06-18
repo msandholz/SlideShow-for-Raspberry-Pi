@@ -51,6 +51,7 @@ def load_image(path, screen_size):
     return surface
 
 def main():
+    os.environ["SDL_VIDEO_WINDOW_POS"] = "0,0"
     pygame.init()
     pygame.display.set_caption("Slideshow")
 
