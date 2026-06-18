@@ -303,8 +303,7 @@ ExecStart=/opt/slideshow/mount-usb.sh
 
 ---
 
-# 7. Slideshow-Anwendung erstellen
-
+# 5. Slideshow-Anwendung erstellen
 
 - Script "slideshow.sh" herunterladen 
 ```bash
@@ -315,7 +314,7 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 chmod +x /opt/slideshow/slideshow.py
 ```
 
-## 7.1 Alternativ: Datei "slideshow.py" manuell anlegen:
+## 5.1 Alternativ: Datei "slideshow.py" manuell anlegen:
 ```bash
 sudo nano /opt/slideshow/slideshow.py
 ```
@@ -471,16 +470,22 @@ chmod +x /opt/slideshow/slideshow.py
 
 ---
 
-# 8. Kiosk-Startskript erstellen
-
-Datei anlegen:
-
+# 5. Kiosk-Startskript erstellen
+- Script "kioskmode.sh" herunterladen 
 ```bash
-sudo nano /opt/slideshow/kiosk.sh
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/kioskmode.sh -o /opt/slideshow/kioskmode.sh
+```
+- Datei ausführbar machen:
+```bash
+chmod +x /opt/slideshow/kiosk.sh
 ```
 
+## 5.1 Alternativ: 
+Datei anlegen:
+```bash
+sudo nano /opt/slideshow/kioskmode.sh
+```
 Inhalt:
-
 ```bash
 #!/bin/bash
 
@@ -495,11 +500,9 @@ openbox-session &
 exec /opt/slideshow/slideshow.py
 ```
 
-Datei ausführbar machen:
 
-```bash
-chmod +x /opt/slideshow/kiosk.sh
-```
+--- 
+
 
 ---
 
