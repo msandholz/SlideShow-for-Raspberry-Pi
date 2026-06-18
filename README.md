@@ -232,6 +232,7 @@ sudo udevadm trigger
 findmnt /data/slideshow
 ls -la /data/slideshow
 sudo -u admin python3 -c 'import os; print(os.listdir("/data/slideshow"))'
+tail -f /var/log/slideshow/mount-usb.log
 ```
 Wichtig: Bei FAT/exFAT/NTFS erzwingen die Mount-Optionen uid=admin,gid=admin passende Rechte. Bei ext4-Sticks kommen die Rechte aus dem Dateisystem selbst; falls Python als admin nichts lesen kann, einmalig auf dem Stick ausführen:
 ```bash
