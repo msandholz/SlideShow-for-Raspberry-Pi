@@ -95,15 +95,14 @@ sudo apt install -y \
 
 # 5. Verzeichnisstruktur anlegen
 
+Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
 ```bash
-
 Executeable Files:
 /opt/slideshow/
-├── slideshow.py
-├── kiosk.sh
-├── mount-usb.sh
 ├── default.png
-└── config/
+├── mount-usb.sh
+├── kiosk.sh
+└── slideshow.py
 
 Log Files:
 /var/log/slideshow/
@@ -124,8 +123,8 @@ Systemd Services:
 udev Rules:
 /etc/udev/rules.d/
 └── 90-slideshow-usb.rules
-
 ```
+
 Ordner für die Executeables anlegen:
 ```bash
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
@@ -141,10 +140,9 @@ Ordner für USB-Stick anlegen:
 sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
 ```
 
----
-
 # 6. Standardbild erzeugen bzw. default.png hochladen
 
+# 6.1 Standardbild default.png
 ```bash
 convert \
   -size 1920x1080 \
