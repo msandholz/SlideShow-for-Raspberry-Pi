@@ -122,27 +122,7 @@ sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
-
-
-### 2.3 Ordner für Log-Files anlegen:
-```bash
-sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
-```
-### 2.4  Ordner für USB-Stick anlegen:
-```bash
-sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
-```
-
-
----
-
-
-## 3. Standardbild erzeugen bzw. default.png hochladen
-### 3.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
-```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
-```
-### 3.2 Alternativ: Standardbild "default.png" generieren
+#### 2.2.2 Alternativ: Standardbild "default.png" generieren
 ```bash
 convert \
   -size 1920x1080 \
@@ -154,7 +134,18 @@ convert \
   /opt/slideshow/default.jpg
 ```
 
-# Mount script
+### 2.3 Ordner für Log-Files anlegen:
+```bash
+sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
+```
+### 2.4  Ordner für USB-Stick anlegen:
+```bash
+sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
+```
+
+---
+
+## 3. Mount script
 
 ```bash
 sudo nano /usr/local/sbin/mount-usb.sh
