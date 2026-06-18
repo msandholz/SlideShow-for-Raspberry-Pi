@@ -524,26 +524,24 @@ sudo nano /etc/systemd/system/slideshow.service
 Inhalt:
 ```ini
 [Unit]
-Description=USB Slideshow Kiosk
-After=systemd-user-sessions.service local-fs.target
+Description=USB Slideshow
+After=display-manager.service
+Wants=display-manager.service
 
 [Service]
 User=admin
-Group=admin
-WorkingDirectory=/home/admin
-
-ExecStartPre=/bin/sleep 5
+WorkingDirectory=/opt/slideshow
 
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/admin/.Xauthority
 
-ExecStart=/usr/bin/startx /opt/slideshow/kiosk.sh -- :0 -nocursor
+ExecStart=/usr/bin/python3 /opt/slideshow/slideshow.py
 
 Restart=always
 RestartSec=5
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
 ```
 
 
