@@ -129,6 +129,8 @@ def main():
                     "feh",
                     "--fullscreen",
                     "--auto-zoom",
+                    "--borderless",
+                    "--hide-pointer",
                     DEFAULT_IMAGE
                 ])
 
