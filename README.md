@@ -143,7 +143,7 @@ sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo 
 
 ---
 
-# 6. Standardbild erzeugen
+# 6. Standardbild erzeugen bzw. default.png hochladen
 
 ```bash
 convert \
@@ -156,6 +156,9 @@ convert \
   /opt/slideshow/default.jpg
 ```
 
+```bash
+scp default.png admin@192.168.1.100:/opt/slideshow/
+```
 
 # Mount script
 
