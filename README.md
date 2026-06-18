@@ -117,11 +117,24 @@ udev Rules:
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
 
-#### 2.2.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+### 2.3 Ordner für Log-Files anlegen:
+```bash
+sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
+```
+### 2.4  Ordner für USB-Stick anlegen:
+```bash
+sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
+```
+
+---
+
+## 3. Local image "default.png"
+### 3.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
-#### 2.2.2 Alternativ: Standardbild "default.png" generieren
+
+### 3.2 Alternativ: Standardbild "default.png" generieren
 ```bash
 convert \
   -size 1920x1080 \
@@ -130,16 +143,42 @@ convert \
   -fill white \
   -pointsize 60 \
   -annotate 0 "Please insert USB-Stick!" \
-  /opt/slideshow/default.jpg
+  /opt/slideshow/default.png
 ```
 
-### 2.3 Ordner für Log-Files anlegen:
+### 3.3 Standardbild testen
+#### 3.3.1 Test Script herunterladen
 ```bash
-sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test_default-png.sh -o /opt/slideshow/default.png
 ```
-### 2.4  Ordner für USB-Stick anlegen:
+
+#### 3.3.2 Alternativ: Python Script manuell anlegen
 ```bash
-sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
+sudo nano /opt/slideshow/test_default_png.py
+```
+
+```bash
+#!/usr/bin/env python3
+
+import os
+import subprocess
+from pathlib import Path
+
+IMAGE = "/opt/slideshow/default.png"
+
+print(f"DISPLAY={os.environ.get('DISPLAY')}")
+print(f"XAUTHORITY={os.environ.get('XAUTHORITY')}")
+
+if not Path(IMAGE).exists():
+    print(f"Datei nicht gefunden: {IMAGE}")
+    exit(1)
+
+subprocess.run([
+    "feh",
+    "--fullscreen",
+    "--auto-zoom",
+    IMAGE
+])
 ```
 
 ---
