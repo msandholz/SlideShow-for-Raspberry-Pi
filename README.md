@@ -19,7 +19,7 @@ Ein Raspberry Pi 3B mit Raspberry Pi OS Bookworm soll als robuster Slideshow-Vie
 
 ---
 
-# 1. System aktualisieren
+## 1. System aktualisieren
 
 ```bash
 sudo apt update
@@ -29,7 +29,7 @@ sudo reboot
 
 ---
 
-# 2. WLAN konfigurieren
+## 2. WLAN konfigurieren
 
 SSID: `WLAN`
 
@@ -46,7 +46,7 @@ ip a
 
 ---
 
-# 3. Hostname und mDNS konfigurieren
+## 3. Hostname und mDNS konfigurieren
 
 Hostname setzen:
 
@@ -75,7 +75,7 @@ SlideShow.local
 
 ---
 
-# 4. Benötigte Software installieren
+## 4. Benötigte Software installieren
 
 ```bash
 sudo apt install -y \
@@ -93,9 +93,8 @@ sudo apt install -y \
 
 ---
 
-# 5. Verzeichnisstruktur anlegen
-
-Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
+## 5. Verzeichnisstruktur anlegen
+### 5.1 Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werden.
 ```bash
 Executeable Files:
 /opt/slideshow/
@@ -125,24 +124,25 @@ udev Rules:
 └── 90-slideshow-usb.rules
 ```
 
-Ordner für die Executeables anlegen:
+### 5.2 Ordner für die Executeables anlegen:
 ```bash
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
-
-Ordner für Log-Files anlegen:
+### 5.3 Ordner für Log-Files anlegen:
 ```bash
 sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
 ```
-
-Ordner für USB-Stick anlegen:
+### 5.4  Ordner für USB-Stick anlegen:
 ```bash
 sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
 ```
 
-# 6. Standardbild erzeugen bzw. default.png hochladen
-
-# 6.1 Standardbild default.png
+## 6. Standardbild erzeugen bzw. default.png hochladen
+### 6.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
+```
+### 6.2 Alternativ: Standardbild "default.png" generieren
 ```bash
 convert \
   -size 1920x1080 \
@@ -152,10 +152,6 @@ convert \
   -pointsize 60 \
   -annotate 0 "Bitte USB-Stick einstecken" \
   /opt/slideshow/default.jpg
-```
-
-```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
 
 # Mount script
