@@ -113,16 +113,18 @@ udev Rules:
 └── 90-slideshow-usb.rules
 ```
 
-### 2.1 Ordner für die Executeables anlegen:
+### 2.1 Ordner anlege
+
+für die Executeables
 ```bash
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
 
-### 2.2 Ordner für Log-Files anlegen:
+für Log-Files
 ```bash
 sudo mkdir -p /var/log/slideshow && sudo chown -R admin:admin /var/log/slideshow
 ```
-### 2.3  Ordner für USB-Stick anlegen:
+als Quelle für die Bilder
 ```bash
 sudo mkdir -p /data/slideshow && sudo chown admin:admin /data/slideshow && sudo chmod 755 /data/slideshow
 ```
