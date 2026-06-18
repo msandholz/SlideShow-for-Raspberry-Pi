@@ -332,11 +332,7 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 sudo systemctl daemon-reload && sudo systemctl enable slideshow.service
 ```
 
-
-
-
-
-## 5.1 Alternativ: Datei "slideshow.py" manuell anlegen:
+## 5.1 Alternativ: Datei "slideshow.py" manuell anlegen
 ```bash
 sudo nano /opt/slideshow/slideshow.py
 ```
@@ -485,24 +481,11 @@ if __name__ == "__main__":
 ```
 
 Datei ausführbar machen:
-
 ```bash
 chmod +x /opt/slideshow/slideshow.py
 ```
 
----
-
-# 5. Kiosk-Startskript erstellen
-- Script "kioskmode.sh" herunterladen 
-```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/kioskmode.sh -o /opt/slideshow/kioskmode.sh
-```
-- Datei ausführbar machen:
-```bash
-chmod +x /opt/slideshow/kiosk.sh
-```
-
-## 5.1 Alternativ: 
+## 5.2 Alternativ: Datei "slideshow.sh" manuell anlegen
 Datei anlegen:
 ```bash
 sudo nano /opt/slideshow/kioskmode.sh
@@ -522,46 +505,13 @@ openbox-session &
 exec /opt/slideshow/slideshow.py
 ```
 
-
---- 
-
-
----
-
-# 9. Systemd-Service erstellen
-
+## 5.3 Alternativ: Systemd-Service "slideshow.service" manuell erstellen
 Datei anlegen:
-
 ```bash
 sudo nano /etc/systemd/system/slideshow.service
 ```
 
 Inhalt:
-
-```ini
-[Unit]
-Description=USB Slideshow Kiosk
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-User=admin
-Group=admin
-
-Environment=DISPLAY=:0
-Environment=XAUTHORITY=/home/admin/.Xauthority
-
-ExecStart=/usr/bin/startx /opt/slideshow/kiosk.sh -- :0 -nocursor
-
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Neu:
-
 ```ini
 [Unit]
 Description=USB Slideshow Kiosk
