@@ -1,13 +1,11 @@
 [Unit]
-Description=USB Slideshow Kiosk
-After=systemd-user-sessions.service local-fs.target
+Description=USB Slideshow
+After=systemd-user-sessions.service
 
 [Service]
 User=admin
 Group=admin
-WorkingDirectory=/home/admin
-
-ExecStartPre=/bin/sleep 5
+WorkingDirectory=/opt/slideshow
 
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/admin/.Xauthority
@@ -16,6 +14,9 @@ ExecStart=/usr/bin/startx /opt/slideshow/slideshow.sh -- :0 -nocursor
 
 Restart=always
 RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
