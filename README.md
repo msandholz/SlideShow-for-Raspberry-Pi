@@ -201,19 +201,15 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /etc/systemd/system/mount-usb.service
 ```
-
-- udev-Regel "90-slideshow-usb.rules" 
-
+- udev-Regel "90-slideshow-usb.rules" anlegen 
 ```bash
 sudo nano /etc/udev/rules.d/90-slideshow-usb.rules
 ```
-
 Inhalt:
 ```bash
-ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", TAG+="systemd", ENV{SYSTEMD_WANTS}+="slideshow-usb-mount.service"
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mount-sub.service"
 ACTION=="remove", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/bin/umount -l /data/slideshow"
 ```
-
 Laden: 
 ```bash
 sudo udevadm control --reload
