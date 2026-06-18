@@ -201,6 +201,11 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /etc/systemd/system/mount-usb.service
 ```
+
+```bash
+sudo chmod +x /usr/local/sbin/mount-usb.sh
+```
+
 - systemd-service "mount-usb.service" starten
 ```bash
 sudo systemctl daemon-reload && sudo systemctl enable mount-usb.service
@@ -279,10 +284,6 @@ case "$FSTYPE" in
 esac
 
 chown "$USER_NAME:$GROUP_NAME" "$MOUNTPOINT" || true
-```
-
-```bash
-sudo chmod +x /usr/local/sbin/mount-slideshow-usb.sh
 ```
 
 ### 4.2 Alternativ: Dienst ""mount-usb.service" manuell anlegen  
