@@ -4,7 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 
-IMAGE = "/opt/slideshow/default.png"
+IMAGE = "/opt/slideshow/default.jpg"
 
 print(f"DISPLAY={os.environ.get('DISPLAY')}")
 print(f"XAUTHORITY={os.environ.get('XAUTHORITY')}")
