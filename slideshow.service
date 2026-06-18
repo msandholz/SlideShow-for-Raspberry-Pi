@@ -1,15 +1,16 @@
 [Unit]
 Description=USB Slideshow
-After=graphical.target
+After=display-manager.service
+Wants=display-manager.service
 
 [Service]
 User=admin
+WorkingDirectory=/opt/slideshow
+
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/admin/.Xauthority
 
-WorkingDirectory=/opt/slideshow
-
-ExecStart=/usr/bin/python3 /opt/slideshow/slideshow.py -- :0
+ExecStart=/usr/bin/python3 /opt/slideshow/slideshow.py
 
 Restart=always
 RestartSec=5
