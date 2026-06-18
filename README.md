@@ -215,7 +215,7 @@ Inhalt:
 ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mount-sub.service"
 ACTION=="remove", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/bin/umount -l /data/slideshow"
 ```
-Laden: 
+- Laden: 
 ```bash
 sudo udevadm control --reload
 sudo udevadm trigger
