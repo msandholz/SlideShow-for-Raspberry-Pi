@@ -1,0 +1,7 @@
+[Unit]
+Description=Mount USB stick for slideshow
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/slideshow/mount-usb.sh
