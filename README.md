@@ -307,10 +307,11 @@ ExecStart=/opt/slideshow/mount-usb.sh
 
 # 7. Slideshow-Anwendung erstellen
 
-Datei anlegen:
+
+Datei ausführbar machen:
 
 ```bash
-sudo nano /opt/slideshow/slideshow.py
+chmod +x /opt/slideshow/slideshow.py
 ```
 
 aktivieren:
@@ -318,21 +319,12 @@ aktivieren:
 sudo systemctl daemon-reload
 ```
 
-# 4. 
 
-# 5. Test
-
-Stick einstecken:
-
+## 7.1 Alternativ: Datei "slideshow.py" manuell anlegen:
 ```bash
-findmnt /data/slideshow
-ls -la /data/slideshow
-sudo -u admin python3 -c 'import os; print(os.listdir("/data/slideshow"))'
+sudo nano /opt/slideshow/slideshow.py
 ```
-
-
 Inhalt:
-
 ```python
 #!/usr/bin/env python3
 
