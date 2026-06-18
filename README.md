@@ -86,10 +86,11 @@ Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werd
 ```bash
 Executeable Files:
 /opt/slideshow/
-├── default.png
-├── test_default_png.py
+├── default.jpg
+├── default1.jpg
+├── test-default-jpg.py
 ├── mount-usb.sh
-├── kiosk.sh
+├── slideshow.sh
 └── slideshow.py
 
 Log Files:
@@ -106,7 +107,7 @@ Pictures:
 Systemd Services:
 /etc/systemd/system/
 ├── mount-usb.service
-└── ----
+└── slideshow.service
 
 udev Rules:
 /etc/udev/rules.d/
