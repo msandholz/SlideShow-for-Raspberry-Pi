@@ -150,7 +150,7 @@ def main():
 
             current_hash = new_hash
             
-         time.sleep(3)
+            time.sleep(3)
 
 if __name__ == "__main__":
     main()
