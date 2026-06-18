@@ -87,6 +87,7 @@ Für die SildeShow sollte folgende Struktur vorhanden sein bzw. hergestellt werd
 Executeable Files:
 /opt/slideshow/
 ├── default.png
+├── test_default_png.py
 ├── mount-usb.sh
 ├── kiosk.sh
 └── slideshow.py
