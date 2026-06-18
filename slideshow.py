@@ -129,15 +129,33 @@ def main():
         new_hash = image_signature(images)
 
         if new_hash != current_hash:
-
+            
+            # ---------------------------
+            # FALLBACK: nur Standardbild
+            # ---------------------------           
             if images == [DEFAULT_IMAGE]:
                 logging.info("Keine Bilder gefunden. Standardbild wird angezeigt.")
-                feh_process = show_default()
+                
+                # laufende Slideshow beenden
+                if feh_process:
+                    feh_process.terminate()
+                    feh_process = None
 
-            else:
-                logging.info(
-                    f"{len(images)} Bilder gefunden."
-                )
+                subprocess.Popen([
+                    "feh",
+                    "--fullscreen",
+                    "--auto-zoom",
+                    DEFAULT_IMAGE
+                ])
+
+                current_hash = new_hash
+                time.sleep(3)
+                continue   # <<< WICHTIG: Rest überspringen
+
+            # ---------------------------
+            # NORMALFALL: Slideshow
+            # ---------------------------
+            logging.info(f"{len(images)} Bilder gefunden.")
 
             write_filelist(images)
 
@@ -147,9 +165,8 @@ def main():
             feh_process = start_feh()
 
             current_hash = new_hash
-
-        time.sleep(3)
-
+            
+     time.sleep(3)
 
 if __name__ == "__main__":
     main()
