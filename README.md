@@ -147,6 +147,10 @@ convert \
 ```
 
 ### 3.3 Standardbild testen
+```bash
+python3 /opt/slideshow/test_default_png.py
+```
+
 #### 3.3.1 Test Script herunterladen
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test_default-png.sh -o /opt/slideshow/default.png
