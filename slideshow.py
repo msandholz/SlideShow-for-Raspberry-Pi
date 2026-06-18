@@ -24,11 +24,31 @@ def find_images():
 
 
 def load_image(path, screen_size):
-    """Lädt Bild und skaliert es auf Bildschirmgröße."""
-    img = pygame.image.load(path)
-    img = pygame.transform.scale(img, screen_size)
-    return img
+    """Lädt Bild, skaliert es proportional und zentriert es (kein Verzerren)."""
 
+    img = pygame.image.load(path)
+
+    screen_w, screen_h = screen_size
+    img_w, img_h = img.get_size()
+
+    # Skalierungsfaktor berechnen (Aspect Ratio erhalten)
+    scale = min(screen_w / img_w, screen_h / img_h)
+
+    new_size = (int(img_w * scale), int(img_h * scale))
+
+    img = pygame.transform.smoothscale(img, new_size)
+
+    # schwarzes Hintergrundbild erzeugen
+    surface = pygame.Surface(screen_size)
+    surface.fill((0, 0, 0))
+
+    # zentrieren
+    x = (screen_w - new_size[0]) // 2
+    y = (screen_h - new_size[1]) // 2
+
+    surface.blit(img, (x, y))
+
+    return surface
 
 def main():
     pygame.init()
