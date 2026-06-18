@@ -300,25 +300,20 @@ Type=oneshot
 ExecStart=/opt/slideshow/mount-usb.sh
 ```
 
----
-
 
 ---
 
 # 7. Slideshow-Anwendung erstellen
 
 
-Datei ausführbar machen:
-
+- Script "slideshow.sh" herunterladen 
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.py -o /opt/slideshow/slideshow.py
+```
+- Datei ausführbar machen:
 ```bash
 chmod +x /opt/slideshow/slideshow.py
 ```
-
-aktivieren:
-```bash
-sudo systemctl daemon-reload
-```
-
 
 ## 7.1 Alternativ: Datei "slideshow.py" manuell anlegen:
 ```bash
