@@ -237,6 +237,7 @@ sudo chown -R admin:admin /data/slideshow
 
 
 ### 4.1 Alternativ: Script "mount-usb.sh" manuell anlegen  
+Datei anlegen:
 ```bash
 sudo nano /opt/slideshow/mount-usb.sh
 ```
@@ -285,7 +286,8 @@ esac
 chown "$USER_NAME:$GROUP_NAME" "$MOUNTPOINT" || true
 ```
 
-### 4.2 Alternativ: Dienst ""mount-usb.service" manuell anlegen  
+### 4.2 Alternativ: Dienst "mount-usb.service" manuell anlegen  
+Datei anlegen:
 ```bash
 sudo nano /etc/systemd/system/mount-usb.service
 ```
@@ -303,7 +305,7 @@ ExecStart=/opt/slideshow/mount-usb.sh
 
 ---
 
-# 5. Slideshow Anwendung
+## 5. Slideshow Anwendung
 
 - Python Script "slideshow.py" herunterladen 
 ```bash
@@ -332,7 +334,8 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 sudo systemctl daemon-reload && sudo systemctl enable slideshow.service
 ```
 
-## 5.1 Alternativ: Datei "slideshow.py" manuell anlegen
+### 5.1 Alternativ: Datei "slideshow.py" manuell anlegen
+Datei anlegen:
 ```bash
 sudo nano /opt/slideshow/slideshow.py
 ```
@@ -485,7 +488,7 @@ Datei ausführbar machen:
 chmod +x /opt/slideshow/slideshow.py
 ```
 
-## 5.2 Alternativ: Datei "slideshow.sh" manuell anlegen
+### 5.2 Alternativ: Datei "slideshow.sh" manuell anlegen
 Datei anlegen:
 ```bash
 sudo nano /opt/slideshow/kioskmode.sh
@@ -505,7 +508,7 @@ openbox-session &
 exec /opt/slideshow/slideshow.py
 ```
 
-## 5.3 Alternativ: Systemd-Service "slideshow.service" manuell erstellen
+### 5.3 Alternativ: Systemd-Service "slideshow.service" manuell erstellen
 Datei anlegen:
 ```bash
 sudo nano /etc/systemd/system/slideshow.service
@@ -553,7 +556,6 @@ sudo raspi-config
 ```
 
 Menü:
-
 ```text
 Display Options
  → Screen Blanking
@@ -579,13 +581,11 @@ tail -f /var/log/slideshow/slideshow.log
 ```
 
 Service-Log:
-
 ```bash
 journalctl -u slideshow.service -f
 ```
 
 Status:
-
 ```bash
 systemctl status slideshow.service
 ```
@@ -627,25 +627,21 @@ Unterordner werden automatisch durchsucht.
 # 15. Wartung
 
 Service neu starten:
-
 ```bash
-sudo systemctl restart slideshow-kiosk.service
+sudo systemctl restart slideshow.service
 ```
 
 Service stoppen:
-
 ```bash
-sudo systemctl stop slideshow-kiosk.service
+sudo systemctl stop slideshow.service
 ```
 
 Service deaktivieren:
-
 ```bash
-sudo systemctl disable slideshow-kiosk.service
+sudo systemctl disable slideshow.service
 ```
 
 Logfile leeren:
-
 ```bash
 sudo truncate -s 0 /var/log/slideshow/slideshow.log
 ```
