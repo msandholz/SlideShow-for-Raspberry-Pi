@@ -118,7 +118,7 @@ udev Rules:
 sudo mkdir -p /opt/slideshow && sudo chown -R admin:admin /opt/slideshow
 ```
 
-### 2.2.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
+#### 2.2.1 Standardbild "default.png" von GitHub ins Verzeichnis "/opt/slideshow/" laden
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
