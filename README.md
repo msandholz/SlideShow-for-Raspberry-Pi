@@ -158,11 +158,11 @@ convert \
   /opt/slideshow/default.png
 ```
 
-#### 3.2  Alternativ: Python Script manuell anlegen
+### 3.2  Alternativ: Python Script "test_default_png.py" manuell anlegen
 ```bash
 sudo nano /opt/slideshow/test_default_png.py
 ```
-
+Inhalt:
 ```bash
 #!/usr/bin/env python3
 
@@ -190,13 +190,45 @@ subprocess.run([
 ---
 
 ## 4. Mounting USB-Stick
+Für das automatiche mounten des USB-Sticks sind folgende Teile anzulegen bzw. zu konfigurieren:
+
+- Script "mount-usb.sh" herunterladen 
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /opt/slideshow/mount-usb.sh
+```
+
+- systemd-Service "mount-usb.service" herunterladen
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /etc/systemd/system/mount-usb.service
+```
+
+- udev-Regel "90-slideshow-usb.rules" 
 
 ```bash
-sudo nano /usr/local/sbin/mount-usb.sh
+sudo nano /etc/udev/rules.d/90-slideshow-usb.rules
 ```
 
 Inhalt:
+```bash
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", TAG+="systemd", ENV{SYSTEMD_WANTS}+="slideshow-usb-mount.service"
+ACTION=="remove", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/bin/umount -l /data/slideshow"
+```
 
+Laden: 
+```bash
+sudo udevadm control --reload
+sudo udevadm trigger
+```
+
+
+
+
+
+### 4.1 Alternativ: Script "mount-usb.sh" manuell anlegen  
+```bash
+sudo nano /usr/local/sbin/mount-usb.sh
+```
+Inhalt:
 ```bash
 #!/bin/bash
 set -euo pipefail
@@ -245,14 +277,11 @@ chown "$USER_NAME:$GROUP_NAME" "$MOUNTPOINT" || true
 sudo chmod +x /usr/local/sbin/mount-slideshow-usb.sh
 ```
 
-# 3. systemd-Service
-
+### 4.2 Alternativ: Dienst ""mount-usb.service" manuell anlegen  
 ```bash
 sudo nano /etc/systemd/system/mount-usb.service
 ```
-
 Inhalt:
-
 ```INI
 [Unit]
 Description=Mount USB stick for slideshow
@@ -261,8 +290,9 @@ After=local-fs.target
 [Service]
 Type=oneshot
 ExecStart=/opt/slideshow/mount-usb.sh
-
 ```
+
+---
 
 
 ---
@@ -280,24 +310,7 @@ aktivieren:
 sudo systemctl daemon-reload
 ```
 
-# 4. udev-Regel
-
-```bash
-sudo nano /etc/udev/rules.d/90-slideshow-usb.rules
-```
-
-Inhalt:
-```bash
-ACTION=="add", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", ENV{ID_FS_USAGE}=="filesystem", TAG+="systemd", ENV{SYSTEMD_WANTS}+="slideshow-usb-mount.service"
-ACTION=="remove", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/bin/umount -l /data/slideshow"
-```
-
-Laden: 
-
-```bash
-sudo udevadm control --reload
-sudo udevadm trigger
-```
+# 4. 
 
 # 5. Test
 
