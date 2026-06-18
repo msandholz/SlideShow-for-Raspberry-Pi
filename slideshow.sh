@@ -8,4 +8,4 @@ unclutter -idle 0.5 -root &
 
 openbox-session &
 
-exec /opt/slideshow/slideshow.py
+exec python3 /opt/slideshow/slideshow.py
