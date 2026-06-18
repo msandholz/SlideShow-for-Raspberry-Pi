@@ -65,8 +65,7 @@ sudo apt install -y \
     exfatprogs
 ```
 
----
-## 2. WLAN konfigurieren
+### 1.4 WLAN konfigurieren
 
 SSID: `WLAN`
 
