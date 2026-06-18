@@ -157,7 +157,7 @@ convert \
 ```
 
 ```bash
-scp default.png admin@192.168.1.100:/opt/slideshow/
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/default.png -o /opt/slideshow/default.png
 ```
 
 # Mount script
