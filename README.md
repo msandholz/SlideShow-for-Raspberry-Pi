@@ -203,7 +203,7 @@ sudo chmod +x /opt/slideshow/mount-usb.sh
 
 - systemd-Service "mount-usb.service" herunterladen
 ```bash
-curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.service -o /etc/systemd/system/mount-usb.service
+sudo curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.service -o /etc/systemd/system/mount-usb.service
 ```
 
 - systemd-service "mount-usb.service" starten
