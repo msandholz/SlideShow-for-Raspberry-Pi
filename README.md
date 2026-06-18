@@ -211,9 +211,9 @@ sudo curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry
 sudo systemctl daemon-reload && sudo systemctl enable mount-usb.service
 ```
 
-- udev-Regel "90-slideshow-usb.rules" anlegen 
+- udev-Regel "99-slideshow-usb.rules" anlegen 
 ```bash
-sudo nano /etc/udev/rules.d/90-slideshow-usb.rules
+sudo nano /etc/udev/rules.d/99-slideshow-usb.rules
 ```
 Inhalt:
 ```bash
