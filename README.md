@@ -303,9 +303,9 @@ ExecStart=/opt/slideshow/mount-usb.sh
 
 ---
 
-# 5. Slideshow-Anwendung erstellen
+# 5. Slideshow Anwendung
 
-- Script "slideshow.sh" herunterladen 
+- Python Script "slideshow.py" herunterladen 
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.py -o /opt/slideshow/slideshow.py
 ```
@@ -313,6 +313,28 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 ```bash
 chmod +x /opt/slideshow/slideshow.py
 ```
+
+- Start-Script "slideshow.sh" herunterladen 
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.sh -o /opt/slideshow/slideshow.sh
+```
+- Datei ausführbar machen:
+```bash
+chmod +x /opt/slideshow/slideshow.sh
+```
+
+- systemd-Service "slideshow.service" herunterladen
+```bash
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.service -o /etc/systemd/system/slideshow.service
+```
+- systemd-service "slideshow.service" starten
+```bash
+sudo systemctl daemon-reload && sudo systemctl enable slideshow.service
+```
+
+
+
+
 
 ## 5.1 Alternativ: Datei "slideshow.py" manuell anlegen:
 ```bash
