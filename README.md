@@ -102,7 +102,7 @@ Executeable Files:
 ├── slideshow.py
 ├── kiosk.sh
 ├── mount-usb.sh
-├── default.jpg
+├── default.png
 └── config/
 
 Log Files:
