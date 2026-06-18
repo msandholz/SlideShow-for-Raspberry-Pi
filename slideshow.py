@@ -54,6 +54,9 @@ def main():
     pygame.init()
     pygame.display.set_caption("Slideshow")
 
+     # 👉 Cursor ausblenden
+    pygame.mouse.set_visible(False)
+
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     screen_size = screen.get_size()
 
