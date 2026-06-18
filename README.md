@@ -129,7 +129,7 @@ convert \
   -gravity center \
   -fill white \
   -pointsize 60 \
-  -annotate 0 "Bitte USB-Stick einstecken" \
+  -annotate 0 "Please insert USB-Stick!" \
   /opt/slideshow/default.jpg
 ```
 
