@@ -101,22 +101,6 @@ def start_feh():
         env=env
     )
 
-def show_default(): 
-    env = os.environ.copy()
-    env["DISPLAY"] = ":0"
-
-    return subprocess.run(
-        [
-            "feh",
-            "--fullscreen",
-            "--auto-zoom",
-            "--borderless",
-            "--hide-pointer",
-            DEFAULT_IMAGE
-        ],
-        env=env
-    )
-
 def main():
     logging.info("Slideshow gestartet")
 
@@ -166,7 +150,7 @@ def main():
 
             current_hash = new_hash
             
-     time.sleep(3)
+         time.sleep(3)
 
 if __name__ == "__main__":
     main()
