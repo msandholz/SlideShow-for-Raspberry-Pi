@@ -146,7 +146,7 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 python3 /opt/slideshow/test-default-jpg.py
 ```
 
-### 3.1  Alternativ: Standardbild "default.png" generieren
+### 3.1  Alternativ: Standardbild "default.jpg" generieren
 ```bash
 convert \
   -size 1920x1080 \
@@ -158,7 +158,7 @@ convert \
   /opt/slideshow/default.jpg
 ```
 
-### 3.2  Alternativ: Python Script "test_default_png.py" manuell anlegen
+### 3.2  Alternativ: Python Script "test-default-jpg.py" manuell anlegen
 ```bash
 sudo nano /opt/slideshow/test-default-jpg.py
 ```
@@ -201,6 +201,11 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 ```bash
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /etc/systemd/system/mount-usb.service
 ```
+- systemd-service "mount-usb.service" starten
+```bash
+sudo systemctl daemon-reload && sudo systemctl enable mount-usb.service
+```
+
 - udev-Regel "90-slideshow-usb.rules" anlegen 
 ```bash
 sudo nano /etc/udev/rules.d/90-slideshow-usb.rules
