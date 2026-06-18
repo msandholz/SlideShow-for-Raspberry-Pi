@@ -198,7 +198,7 @@ Für das automatiche mounten des USB-Sticks sind folgende Teile anzulegen bzw. z
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /opt/slideshow/mount-usb.sh
 ```
 ```bash
-sudo chmod +x /usr/local/sbin/mount-usb.sh
+sudo chmod +x /opt/slideshow/mount-usb.sh
 ```
 
 - systemd-Service "mount-usb.service" herunterladen
