@@ -3,7 +3,6 @@
 # mDNS
 apt install -y avahi-daemon
 systemctl enable --now avahi-daemon
-systemctl start --now avahi-daemon
 
 
 # Folder for executabels
@@ -14,10 +13,10 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/test-default-jpg.py -o /opt/slideshow/test-default-jpg.py
 
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/mount-usb.sh -o /opt/slideshow/mount-usb.sh
-chmod +x /opt/slideshow/mount-usb.sh
+chmod 755 /opt/slideshow/mount-usb.sh
 
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.py -o /opt/slideshow/slideshow.py
-chmod +x /opt/slideshow/slideshow.py
+chmod 755 /opt/slideshow/slideshow.py
 
 # Folder for logfiles
 mkdir -p /var/log/slideshow
@@ -39,8 +38,5 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.service -o /etc/systemd/system/slideshow.service
 
 systemctl daemon-reload
-systemctl enable mount-usb.service
-systemctl enable slideshow.service
-
-systemctl start mount-usb.service
-systemctl start slideshow.service
+systemctl enable --now mount-usb.service
+systemctl enable --now slideshow.service
