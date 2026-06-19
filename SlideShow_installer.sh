@@ -4,6 +4,11 @@
 apt install -y avahi-daemon
 systemctl enable --now avahi-daemon
 
+# Other libraries
+apt install -y python3 python3-pip
+apt install -y usdisks2 exfatprogs
+
+
 
 # Folder for executabels
 mkdir -p /opt/slideshow 
