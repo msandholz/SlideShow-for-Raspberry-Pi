@@ -88,12 +88,12 @@ def main():
                 images = find_images()
                 last_scan = now
 
-              # Wenn neue Bilder vorhanden oder Liste leer geworden ist
-              if images != current_images:
-                  current_images = images
-                  index = 0
-                  last_switch = now
-                  current_path = None   # erzwingt Neuladen des angezeigten Bildes</span>
+            # Wenn neue Bilder vorhanden oder Liste leer geworden ist
+            if images != current_images:
+                current_images = images
+                index = 0
+                last_switch = now
+                current_path = None   # erzwingt Neuladen des angezeigten Bildes</span>
 
         # Auswahl Bild
         if len(current_images) == 0:
