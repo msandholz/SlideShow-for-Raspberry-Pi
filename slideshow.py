@@ -104,7 +104,7 @@ def main():
 
         # Bild nur neu laden, wenn sich der Pfad geändert hat
         if path != current_path:
-            try:</span>
+            try:
                 current_surface = load_image(path, screen_size)
                 current_path = path
             except Exception as e:
