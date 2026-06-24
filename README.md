@@ -321,6 +321,15 @@ curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/m
 ```bash
 chmod +x /opt/slideshow/slideshow.py
 ```
+- Python Script "slideshow.py" sicher und updaten
+```bash
+sudo systemctl stop slideshow.service
+sudo cp /opt/slideshow/slideshow.py /opt/slideshow/slideshow_$(date +%F_%H-%M-%S).py
+curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.py -o /opt/slideshow/slideshow.py
+ls /opt/slideshow
+sudo systemctl start slideshow.service
+```
+
 
 - Start-Script "slideshow.sh" herunterladen 
 ```bash
