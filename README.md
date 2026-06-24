@@ -93,7 +93,7 @@ Executeable Files:
 └── slideshow.py
 
 Log Files:
-/var/log/slideshow/
+/opt/slideshow/log/
 ├── slideshow.log
 └── mount-usb.log
 
