@@ -326,7 +326,7 @@ chmod +x /opt/slideshow/slideshow.py
 sudo systemctl stop slideshow.service
 sudo cp /opt/slideshow/slideshow.py /opt/slideshow/slideshow_$(date +%F_%H-%M-%S).py
 curl -L https://raw.githubusercontent.com/msandholz/SlideShow-for-Raspberry-Pi/main/slideshow.py -o /opt/slideshow/slideshow.py
-ls /opt/slideshow
+ls -l /opt/slideshow
 sudo systemctl start slideshow.service
 ```
 
