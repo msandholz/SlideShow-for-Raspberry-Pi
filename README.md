@@ -539,7 +539,13 @@ sudo reboot
 
 ---
 
-# 12. Logging
+# 12. Bilder von USB-Stick aus SD-Karte übertragen
+
+```bash
+sudo rsync -av /data/slideshow/ /opt/slideshow/pics/
+```
+
+# 13. Logging
 
 Anwendungslog:
 
