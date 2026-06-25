@@ -549,7 +549,7 @@ tail -F /opt/slideshow/log/slideshow.log
 
 Service-Log:
 ```bash
-journalctl -u slideshow.service -f
+journalctl -u slideshow.service -f -n 100
 ```
 
 Status:
