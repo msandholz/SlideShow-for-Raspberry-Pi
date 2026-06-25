@@ -544,7 +544,7 @@ sudo reboot
 Anwendungslog:
 
 ```bash
-tail -f /var/log/slideshow/slideshow.log
+tail -F /opt/slideshow/log/slideshow.log
 ```
 
 Service-Log:
