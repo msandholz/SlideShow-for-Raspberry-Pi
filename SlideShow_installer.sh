@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "$(id -u)" -ne 0 ]; then
+  echo "Bitte mit sudo starten: sudo ./install.sh"
+  exit 1
+fi
+
 # mDNS
 apt install -y avahi-daemon
 systemctl enable --now avahi-daemon
 
 # Other libraries
-apt install -y python3 python3-pip
+apt install -y python3 python3-pip rsync 
 apt install -y usdisks2 exfatprogs
 
 
