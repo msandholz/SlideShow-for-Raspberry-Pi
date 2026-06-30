@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="check-result">
+  Alle hochgeladenen Bilder werden automatisch mittig auf 16:9 geschnitten und als
+  <strong>1920 x 1080 JPEG</strong> gespeichert. Dadurch entsteht keine Verzerrung.
+</div>
+
+<h2>Normale Anzeigebilder hochladen</h2>
+<p class="hint">Zielverzeichnis: {{ pics_dir }} | Aktuell: {{ pics_count }} Bild(er)</p>
+<form method="post" action="{{ url_for('upload_images', kind='pics') }}" enctype="multipart/form-data">
+  <input type="file" name="images" multiple accept="image/*" required>
+  <p><button class="success" type="submit">Upload</button></p>
+</form>
+
+<form method="post" action="{{ url_for('import_usb_images', kind='pics') }}">
+  <p class="hint">Oder direkt vom am Raspberry gemounteten USB-Stick importieren: {{ usb_pics_dir }}</p>
+  <p><button class="success" type="submit">USB importieren</button></p>
+</form>
+
+<hr>
+
+<h2>Werbebilder hochladen</h2>
+<p class="hint">Zielverzeichnis: {{ sponsors_dir }} | Aktuell: {{ sponsors_count }} Bild(er)</p>
+<form method="post" action="{{ url_for('upload_images', kind='sponsors') }}" enctype="multipart/form-data">
+  <input type="file" name="images" multiple accept="image/*" required>
+  <p><button class="success" type="submit">Upload</button></p>
+</form>
+
+<form method="post" action="{{ url_for('import_usb_images', kind='sponsors') }}">
+  <p class="hint">Oder direkt vom am Raspberry gemounteten USB-Stick importieren: {{ usb_sponsors_dir }}</p>
+  <p><button class="success" type="submit">USB importieren</button></p>
+</form>
+
+{% endblock %}

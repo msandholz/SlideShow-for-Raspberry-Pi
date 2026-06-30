@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="check-result">
+  Logdatei: <strong>{{ log_file }}</strong><br>
+  Aktualisierung automatisch alle 2 Sekunden.
+</div>
+
+<p class="txt_center">
+  <button class="success" type="button" onclick="refreshLogs()">Refresh</button>
+</p>
+
+<pre id="logbox" class="logbox">Logs werden geladen ...</pre>
+<p id="logstatus" class="hint txt_center"></p>
+
+{% endblock %}

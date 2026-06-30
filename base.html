@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Slideshow {{ hostname }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+  <style>
+    /* Kleine Ergaenzungen, damit die vorhandene CSS-Datei ohne Aenderung nutzbar bleibt. */
+    .content-box {
+      max-width: 980px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .form-table td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+    }
+    input[type="number"],
+    input[type="text"] {
+      font-size: 18px;
+      padding: 6px;
+      width: 180px;
+    }
+    input[type="file"] {
+      font-size: 16px;
+      padding: 8px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .flash {
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 6px;
+      background: #ddd;
+      border: 1px solid dimgray;
+      text-align: center;
+    }
+    .flash.success {
+      width: auto;
+      background: #e7fff3;
+      color: #027a4f;
+      border-color: #04AA6D;
+    }
+    .flash.error {
+      background: #ffeaea;
+      color: #aa0000;
+      border-color: #ee1b24;
+    }
+    .logbox {
+      width: 100%;
+      min-height: 520px;
+      padding: 12px;
+      background: #111;
+      color: #eee;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: Consolas, Monaco, monospace;
+      text-align: left;
+      border-radius: 5px;
+    }
+    .hint {
+      color: #555;
+      font-size: 0.9em;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 15px 0;
+    }
+    .stat-card {
+      border: 1px solid dimgray;
+      border-radius: 6px;
+      background: #f8f8f8;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-card strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <a href="{{ url_for('index') }}">Konfiguration</a>
+    <a href="{{ url_for('upload_page') }}">Bilder hochladen</a>
+    <a href="{{ url_for('logs_page') }}">Logs</a>
+    <a href="{{ url_for('api_config') }}">API Config</a>
+  </div>
+
+  <div class="row">
+    <div class="content-box">
+      <h1 class="txt_center">Slideshow-Steuerung: {{ hostname }}</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  <div class="footer">
+    Hostname/WLAN-SSID: <strong>{{ hostname }}</strong> |
+    Basisverzeichnis: <strong>{{ base_dir }}</strong>
+  </div>
+</body>
+</html>

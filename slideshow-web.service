@@ -1,0 +1,19 @@
+[Unit]
+Description=Slideshow Webapp
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+Group=__USER__
+WorkingDirectory=__APP_DIR__
+Environment=SLIDESHOW_BASE_DIR=__BASE_DIR__
+Environment=FLASK_HOST=0.0.0.0
+Environment=FLASK_PORT=8080
+ExecStart=__APP_DIR__/venv/bin/gunicorn --workers 2 --threads 4 --bind 0.0.0.0:8080 app:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

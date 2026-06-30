@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="stat-grid">
+  <div class="stat-card">
+    Normale Bilder
+    <strong>{{ pics_count }}</strong>
+    <span class="hint">{{ pics_dir }}</span>
+  </div>
+  <div class="stat-card">
+    Werbebilder
+    <strong>{{ sponsors_count }}</strong>
+    <span class="hint">{{ sponsors_dir }}</span>
+  </div>
+  <div class="stat-card">
+    Aktuelle Anzeigedauer
+    <strong>{{ config.display_seconds }} s</strong>
+    <span class="hint">pro Bild</span>
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('update_config') }}">
+  <table class="form-table">
+    <tr>
+      <td><strong>Anzeigedauer pro Bild</strong></td>
+      <td>
+        <input type="number" name="display_seconds" min="1" max="86400"
+               value="{{ config.display_seconds }}" required> Sekunden
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Werbung einschalten</strong></td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" name="ads_enabled" {% if config.ads_enabled %}checked{% endif %}>
+          <span class="slider round"></span>
+        </label>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Werbung jedes x-te Bild</strong></td>
+      <td>
+        <input type="number" name="sponsor_every_n" min="1" max="10000"
+               value="{{ config.sponsor_every_n }}" required>
+        <span class="hint">Beispiel: 5 = nach jedem 5. normalen Bild ein Werbebild.</span>
+      </td>
+    </tr>
+  </table>
+
+  <p class="txt_center">
+    <button class="success" type="submit">Speichern</button>
+  </p>
+</form>
+
+<div class="check-result">
+  Die gespeicherte Konfiguration liegt unter <strong>{{ base_dir }}/config.json</strong>.
+  Dein Slideshow-Programm kann sie alternativ per <strong>/api/config</strong> lesen.
+</div>
+
+{% endblock %}
